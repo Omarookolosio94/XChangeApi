@@ -207,10 +207,12 @@ namespace XChange.Api.Controllers
             _registrationLogService.AddRegistrationLog(registrationSuccessLog);
 
 
-            var message = new Message(new string[] { user.Email}, "Registration Successful", "You have been successful registered");
+            var message = new Message(new string[] { user.Email}, "Registration Successful", "Your Registration to XChange.com was successful");
             _emailService.SendEmail(message);
 
-            return CreatedAtRoute("GetUser", new { UserId = newUser.UserId }, newUser);
+            ApiResponse response = new ApiResponse(200 , "Registration Successful" , "Verfification Email has been sent to "+ user.Email);
+            return Ok(response);
+            //return CreatedAtRoute("GetUser", new { UserId = newUser.UserId }, newUser);
         }
 
 
@@ -220,7 +222,7 @@ namespace XChange.Api.Controllers
         {
 
             var result = _usersService.GetUser(userId);
-            ApiError response;
+            ApiResponse response;
 
             if (result.Result != null)
             {
@@ -228,7 +230,7 @@ namespace XChange.Api.Controllers
             }
             else
             {
-                response = new ApiError(404, "Not Found");
+                response = new ApiResponse(404, "Not Found");
                 return NotFound(response);
             }
 
@@ -240,15 +242,15 @@ namespace XChange.Api.Controllers
         {
 
             var result = _usersService.GetUsers();
-            ApiError response;
+            ApiResponse response;
 
             if (result.Result != null)
             {
-                return Ok(result);
+                return Ok(result.Result);
             }
             else
             {
-                response = new ApiError(404, "No User Found");
+                response = new ApiResponse(404, "No User Found");
                 return NotFound(response);
             }
 

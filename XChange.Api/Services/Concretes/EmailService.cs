@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Utilities.Logger;
 using XChange.Api.DTO;
 using XChange.Api.Services.Interfaces;
 
@@ -12,6 +13,7 @@ namespace XChange.Api.Services.Concretes
 {
     public class EmailService : IEmailService
     {
+        private static string ModuleName = "EmailService";
         private readonly EmailConfiguration _emailConfiguration;
 
         public EmailService(EmailConfiguration emailConfiguration)
@@ -32,17 +34,19 @@ namespace XChange.Api.Services.Concretes
             emailMessage.From.Add(MailboxAddress.Parse(_emailConfiguration.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
+            //emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
             //emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = string.Format("<h2 style='color:red;'>{0}</h2>", message.Content) };
 
-            /*
             string FilePath = Directory.GetCurrentDirectory() + "\\Utility\\WelcomeEmailTemplate.html";
             StreamReader str = new StreamReader(FilePath);
             string MailText = str.ReadToEnd();
             str.Close();
 
-            MailText = MailText.Replace("[username]", message.To).Replace("[email]", message.To);
-            */
+            MailText = MailText.Replace("[content]" , message.Content);
+
+            var builder = new BodyBuilder();
+            builder.HtmlBody = MailText;
+            emailMessage.Body = builder.ToMessageBody();
 
             return emailMessage;
         }
@@ -61,7 +65,7 @@ namespace XChange.Api.Services.Concretes
                 }
                 catch
                 {
-                    //log an error message or throw an exception or both.
+                    new Logger().LogError(ModuleName, "Send Email", "Error  sending email" + "\n");
                     throw;
                 }
                 finally

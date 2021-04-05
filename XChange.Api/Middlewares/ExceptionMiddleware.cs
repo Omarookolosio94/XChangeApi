@@ -28,7 +28,7 @@ namespace XChange.Api.Middlewares
             catch(Exception ex)
             {
 
-                ApiError response;
+                ApiResponse response;
                 HttpStatusCode statusCode = HttpStatusCode.InternalServerError;
                 String message;
                 var exceptionType = ex.GetType();
@@ -47,10 +47,10 @@ namespace XChange.Api.Middlewares
 
                 if (env.IsDevelopment())
                 {
-                    response = new ApiError((int)statusCode, ex.Message, ex.StackTrace.ToString());
+                    response = new ApiResponse((int)statusCode, ex.Message, ex.StackTrace.ToString());
                 } else
                 {
-                    response = new ApiError((int)statusCode, message);
+                    response = new ApiResponse((int)statusCode, message);
 
                 }
 
