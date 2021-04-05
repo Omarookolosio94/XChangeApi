@@ -1,0 +1,7 @@
+﻿ 
+ //scaffolding code
+ Scaffold-DbContext "Data Source=.;Initial Catalog=XChangeDatabase;Integrated Security=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
+
+
+Install-Package MailKit
+Install-Package MimeKit
