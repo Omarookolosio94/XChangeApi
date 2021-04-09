@@ -17,6 +17,7 @@ namespace XChange.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class UsersController : ControllerBase
     {
 
@@ -24,27 +25,28 @@ namespace XChange.Api.Controllers
         private readonly IUsersService _usersService;
         private readonly IRegistrationLogService _registrationLogService;
         public readonly IEmailService _emailService;
+        private readonly IOtpLogService _otpLogService;
 
 
         public UsersController(IEmailService emailService)
         {
             _usersService = new UsersService(new UsersRepository(dbContext));
             _registrationLogService = new RegistrationLogService(new RegistrationLogRepository(dbContext));
+            _otpLogService = new OtpLogService(new OtpLogRepository(dbContext));
             _emailService = emailService;
-          
+
         }
 
         //POST api/users
-        //[ProducesResponseType(201)]
-        //[ProducesResponseType(400)]
-        //[Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         [HttpPost]
         public async Task<IActionResult> Users([FromBody] User user)
 
         {
             ModelError errors;
             List<Error> errorList = new List<Error> { };
-            //RegistrationLog registrationLog = new RegistrationLog { };
             bool dataValid = true;
 
             //Validate First Name
@@ -87,7 +89,6 @@ namespace XChange.Api.Controllers
                 dataValid = false;
 
             }
-
 
             //Validate FirstName Length
             if (!Validation.IsNull(user.UserLastName) && user.UserLastName.Length > 40)
@@ -200,19 +201,44 @@ namespace XChange.Api.Controllers
                 newUser.Gender = newUser.Gender.ToUpper();
             }
 
-            await _usersService.RegisterUser(newUser);
-
-            //log successful request
-            RegistrationLog registrationSuccessLog = Utility.Utility.AddRegistrationLog(user, true);
-            _registrationLogService.AddRegistrationLog(registrationSuccessLog);
+            var result = await _usersService.RegisterUser(newUser);
 
 
-            var message = new Message(new string[] { user.Email}, "Registration Successful", "Your Registration to XChange.com was successful");
-            _emailService.SendEmail(message);
+            if (result)
+            {
+                //log successful request
+                RegistrationLog registrationSuccessLog = Utility.Utility.AddRegistrationLog(user, true);
+                _registrationLogService.AddRegistrationLog(registrationSuccessLog);
 
-            ApiResponse response = new ApiResponse(200 , "Registration Successful" , "Verfification Email has been sent to "+ user.Email);
-            return Ok(response);
-            //return CreatedAtRoute("GetUser", new { UserId = newUser.UserId }, newUser);
+                //generate otp
+                OtpLog userOtp = Utility.Utility.NewOtpLog(user.Email);
+
+                //save otp to database
+                var otpResult = await _otpLogService.AddOtp(userOtp);
+                Message message;
+
+                //send otp validation email to user
+                if (otpResult)
+                {
+                    message = new Message(new string[] { user.Email }, "Registration Successful", "Your Registration to XChange.com was successful. Validate your account using otp: " + userOtp.Otp);
+                }
+                else
+                {
+                    message = new Message(new string[] { user.Email }, "Registration Successful", "Your Registration to XChange.com was successful. Visit XChange.com/Validate to validate your account");
+                }
+
+                _emailService.SendEmail(message);
+
+
+                ApiResponse response = new ApiResponse(200, "Registration Successful", "Verfification Email has been sent to " + user.Email);
+                return Ok(response);
+            }
+            else
+            {
+                //log exception response
+                ApiResponse response = new ApiResponse(400, "An error occurred while processing information provided. Please , review Details and try again");
+                return BadRequest(response);
+            }
         }
 
 

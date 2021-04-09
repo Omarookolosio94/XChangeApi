@@ -25,6 +25,7 @@ namespace XChange.Api.Models
         public virtual DbSet<Offers> Offers { get; set; }
         public virtual DbSet<OrderHasProducts> OrderHasProducts { get; set; }
         public virtual DbSet<Orders> Orders { get; set; }
+        public virtual DbSet<OtpLog> OtpLog { get; set; }
         public virtual DbSet<Payments> Payments { get; set; }
         public virtual DbSet<Products> Products { get; set; }
         public virtual DbSet<RegistrationLog> RegistrationLog { get; set; }
@@ -40,7 +41,7 @@ namespace XChange.Api.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=XChangeDatabase;Integrated Security=True;");
             }
         }
@@ -254,6 +255,32 @@ namespace XChange.Api.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
+            });
+
+            modelBuilder.Entity<OtpLog>(entity =>
+            {
+                entity.Property(e => e.OtpLogId).HasColumnName("OtpLogID");
+
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.IsSent)
+                    .IsRequired()
+                    .HasColumnName("Is_Sent")
+                    .HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.IsValidated).HasColumnName("Is_Validated");
+
+                entity.Property(e => e.MobileNumber).HasMaxLength(50);
+
+                entity.Property(e => e.Otp)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.TimeSent)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
             });
 
             modelBuilder.Entity<Payments>(entity =>

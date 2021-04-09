@@ -13119,11 +13119,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\A240990\\Source\\XChangeApi\\XChange.Api\\XChange.Api.csproj",
+      "projectUniqueName": "C:\\Users\\A240990\\source\\XChangeApi\\XChange.Api\\XChange.Api.csproj",
       "projectName": "XChange.Api",
-      "projectPath": "C:\\Users\\A240990\\Source\\XChangeApi\\XChange.Api\\XChange.Api.csproj",
+      "projectPath": "C:\\Users\\A240990\\source\\XChangeApi\\XChange.Api\\XChange.Api.csproj",
       "packagesPath": "C:\\Users\\A240990\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\A240990\\Source\\XChangeApi\\XChange.Api\\obj\\",
+      "outputPath": "C:\\Users\\A240990\\source\\XChangeApi\\XChange.Api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -13142,8 +13142,8 @@
       "frameworks": {
         "netcoreapp2.1": {
           "projectReferences": {
-            "C:\\Users\\A240990\\Source\\XChangeApi\\Utilities\\Utilities.csproj": {
-              "projectPath": "C:\\Users\\A240990\\Source\\XChangeApi\\Utilities\\Utilities.csproj"
+            "C:\\Users\\A240990\\source\\XChangeApi\\Utilities\\Utilities.csproj": {
+              "projectPath": "C:\\Users\\A240990\\source\\XChangeApi\\Utilities\\Utilities.csproj"
             }
           }
         }

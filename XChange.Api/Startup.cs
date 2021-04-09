@@ -30,6 +30,7 @@ namespace XChange.Api
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IRegistrationLogService, RegistrationLogService>();
+            services.AddScoped<IOtpLogService, OtpLogService>();
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

@@ -29,5 +29,22 @@ namespace XChange.Api.Utility
             return registrationLog;
 
         }
+
+        public static OtpLog NewOtpLog(string email , int otpLength = 6)
+        {
+            var otp = Utilities.Validation.Validation.GenerateOTP(otpLength);
+
+            OtpLog otpLog = new OtpLog
+            {
+                Email = email,
+                IsSent = true,
+                IsValidated = false,
+                Otp = otp,
+                TimeSent = DateTime.Now
+            };
+
+            return otpLog;
+
+        }
     }
 }

@@ -13,8 +13,6 @@ namespace XChange.Data.Services.Concretes
     public class UsersService : IUsersService
     {
         private readonly IUsersRepository _usersRepository;
-        private readonly IRegistrationLogRepository _registrationLogRepository;
-        //private static string ModuleName = "UsersService";
 
         public UsersService(IUsersRepository usersRepository )
         {
@@ -62,8 +60,6 @@ namespace XChange.Data.Services.Concretes
                 throw;
             }
         }
-
-
 
         public async Task<bool> IsEmailRegistered(string email)
         {

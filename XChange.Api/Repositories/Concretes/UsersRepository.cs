@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities.Logger;
+using XChange.Api.DTO;
 using XChange.Api.Models;
 using XChange.Api.Repositories.Interfaces;
 using XChange.Api.Services.Concretes;
@@ -16,10 +17,16 @@ namespace XChange.Api.Repositories.Concretes
     {
 
         private static string ModuleName = "UsersRepository";
+        private readonly IRegistrationLogService _registrationLogService;
+        private readonly XChangeDatabaseContext dbGeneralContext = new XChangeDatabaseContext();
+
+
 
         public UsersRepository(XChangeDatabaseContext dbContext)
         {
             _dbContext = dbContext;
+            _registrationLogService = new RegistrationLogService(new RegistrationLogRepository(dbGeneralContext));
+
         }
 
         public async Task<bool> RegisterUser(Users user)
@@ -32,6 +39,22 @@ namespace XChange.Api.Repositories.Concretes
             }
             catch (Exception ex)
             {
+                User logUser = new User
+                {
+                    Email = user.Email,
+                    Gender = user.Gender,
+                    Password = user.Password,
+                    UserFirstName = user.UserFirstName,
+                    UserLastName = user.UserLastName,
+                    UserType = user.UserType
+                };
+
+                //log exception
+                new Logger().LogError(ModuleName, "RegisterUser", "Error Registering User" + user + ex + "\n");
+
+                RegistrationLog registrationSuccessLog = Utility.Utility.AddRegistrationLog(logUser, false , ex.Message.ToString());
+                _registrationLogService.AddRegistrationLog(registrationSuccessLog);
+
                 throw;
             }
         }
