@@ -15,7 +15,7 @@ using XChange.Api.Services.Concretes;
 
 namespace XChange.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     [Produces("application/json")]
     public class UsersController : ControllerBase
@@ -24,6 +24,7 @@ namespace XChange.Api.Controllers
         private readonly XChangeDatabaseContext dbContext = new XChangeDatabaseContext();
         private readonly IUsersService _usersService;
         private readonly IRegistrationLogService _registrationLogService;
+        private readonly IAuditLogService _auditLogService;
         public readonly IEmailService _emailService;
         private readonly IOtpLogService _otpLogService;
 
@@ -33,22 +34,54 @@ namespace XChange.Api.Controllers
             _usersService = new UsersService(new UsersRepository(dbContext));
             _registrationLogService = new RegistrationLogService(new RegistrationLogRepository(dbContext));
             _otpLogService = new OtpLogService(new OtpLogRepository(dbContext));
+            _auditLogService = new AuditLogService(new AuditLogRepository(dbContext));
             _emailService = emailService;
 
         }
 
+        //GET api/users
+        //Get all users
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [HttpGet]
+        public IActionResult users()
+        {
+            var result = _usersService.GetUsers();
+            ApiResponse response;
+
+            if (result.Result != null)
+            {
+                //Mask User Password
+                var userList = result.Result;
+                foreach (var user in userList)
+                {
+                    user.Password = "*********";
+                }
+
+                return Ok(userList);
+            }
+            else
+            {
+                response = new ApiResponse(404, "No User Found");
+                return NotFound(response);
+            }
+
+        }
+
         //POST api/users
+        //create a new user
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [HttpPost]
-        public async Task<IActionResult> Users([FromBody] User user)
+        public async Task<IActionResult> users([FromBody] User user)
 
         {
             ModelError errors;
             List<Error> errorList = new List<Error> { };
             bool dataValid = true;
 
+            /*
             //Validate First Name
             if (Validation.IsNull(user.UserFirstName))
             {
@@ -103,6 +136,7 @@ namespace XChange.Api.Controllers
                 dataValid = false;
 
             }
+            */
 
             //Validate User Type
             if (Validation.IsNull(user.UserType) || user.UserType.Length > 1 || !user.UserType.ToString().ToLower().Intersect("bs").Any())
@@ -184,25 +218,23 @@ namespace XChange.Api.Controllers
                 return BadRequest(errors);
             }
 
-            //Hash Password , Override Date to present Date , Change UserType and Gender to Uppercases
+            //create Users model
             Users newUser = new Users
             {
-                UserFirstName = user.UserFirstName,
-                UserLastName = user.UserLastName,
                 Password = BC.HashPassword(user.Password),
                 DateRegistered = DateTime.Now,
                 UserType = user.UserType.ToUpper(),
-                Gender = user.Gender,
-                Email = user.Email,
+                Email = user.Email.ToString().ToLower(),
             };
 
+            /*
             if (!Validation.IsNull(newUser.Gender))
             {
                 newUser.Gender = newUser.Gender.ToUpper();
             }
+            */
 
             var result = await _usersService.RegisterUser(newUser);
-
 
             if (result)
             {
@@ -235,16 +267,17 @@ namespace XChange.Api.Controllers
             }
             else
             {
-                //log exception response
                 ApiResponse response = new ApiResponse(400, "An error occurred while processing information provided. Please , review Details and try again");
                 return BadRequest(response);
             }
         }
 
-
-
+        //GET api/users/{userId}
+        //Get Single User
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         [HttpGet("{userId}", Name = "GetUser")]
-        public IActionResult GetUser(int userId)
+        public IActionResult getUser(int userId)
         {
 
             var result = _usersService.GetUser(userId);
@@ -252,6 +285,9 @@ namespace XChange.Api.Controllers
 
             if (result.Result != null)
             {
+                //Mask User Password
+                result.Result.Password = "********";
+
                 return Ok(result.Result);
             }
             else
@@ -262,25 +298,202 @@ namespace XChange.Api.Controllers
 
         }
 
-
-        [HttpGet]
-        public IActionResult Users()
+        //POST api/users/otp
+        //Verify Otp issued to user 
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [HttpPost("otp", Name = "VerifyOtp")]
+        public async Task<IActionResult> Otp([FromBody] OtpVerify otpVerify)
         {
 
-            var result = _usersService.GetUsers();
+            //validate otp
+            var isOtpValid = await _otpLogService.IsOtpValid(otpVerify.Email, otpVerify.Otp);
             ApiResponse response;
 
-            if (result.Result != null)
+            if (isOtpValid)
             {
-                return Ok(result.Result);
+                //update user verified status if successfull
+                var user = await _usersService.GetUserByEmail(otpVerify.Email);
+
+                if (user != null)
+                {
+                    if (!user.IsVerified)
+                    {
+                        await _usersService.VerifyUser(user.UserId, true);
+                    }
+
+                    //send jwt token back to user      
+                    response = new ApiResponse(200, "Your account has been verified successfully");
+                    return Ok(response);
+
+                }
+                else
+                {
+                    response = new ApiResponse(404, "An error occurred, Please Try Again");
+                    return NotFound(response);
+                }
+
             }
             else
             {
-                response = new ApiResponse(404, "No User Found");
-                return NotFound(response);
+                response = new ApiResponse(400, "An error occured, request for new OTP");
+                return BadRequest(response);
             }
 
         }
 
+
+        //GET api/users/otp
+        //Generate Otp for user
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        //[ProducesResponseType(404)]
+        [HttpGet("otp", Name = "GenerateOtp")]
+        public async Task<IActionResult> Otp(string email)
+        {
+            ApiResponse response;
+
+            //validate email
+            if (Validation.IsNull(email) || !Validation.IsValidEmail(email))
+            {
+                List<Error> errorList = new List<Error> { };
+                Error err = new Error
+                {
+                    modelName = "Email",
+                    modelErrorMessgae = "Valid Email is Required",
+                };
+
+                errorList.Add(err);
+                ModelError errors = new ModelError(400, "Pass in Required Information", errorList);
+                return BadRequest(errors);
+            }
+
+            //check if email has been registered
+            bool isUserRegistered = await _usersService.IsEmailRegistered(email);
+            if (!isUserRegistered)
+            {
+                response = new ApiResponse(404, "Account not yet registered , Please register");
+                return NotFound(response);
+            }
+
+            var userEmail = email.ToString().ToLower();
+
+            //generate otp
+            OtpLog userOtp = Utility.Utility.NewOtpLog(userEmail);
+            
+            //save otp to database
+            bool otpResult = await _otpLogService.AddOtp(userOtp);
+
+            if (otpResult)
+            {
+                var message = new Message(new string[] { userEmail }, "Validation OTP", "Validate your account using otp: " + userOtp.Otp);
+                _emailService.SendEmail(message);
+                response = new ApiResponse(200, "OTP Generated successfully", "Validation OTP has been sent to: " + userEmail);
+                return Ok(response);
+            }
+
+            response = new ApiResponse(400, "An error occured, request for new OTP");
+            return BadRequest(response);
+        }
+
+
+        //GET api/users/password
+        //Reset Password ,sends reset OTP to user
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        //[ProducesResponseType(404)]
+        [HttpGet("password", Name = "ResetPasswordOTP")]
+        public async Task<IActionResult> password(string email)
+        {
+            ApiResponse response;
+
+            //validate email
+            if (Validation.IsNull(email) || !Validation.IsValidEmail(email))
+            {
+                List<Error> errorList = new List<Error> { };
+                Error err = new Error
+                {
+                    modelName = "Email",
+                    modelErrorMessgae = "Valid Email is Required",
+                };
+
+                errorList.Add(err);
+                ModelError errors = new ModelError(400, "Pass in Required Information", errorList);
+                return BadRequest(errors);
+            }
+
+            //check if email has been registered
+            bool isUserRegistered = await _usersService.IsEmailRegistered(email);
+
+            if (!isUserRegistered)
+            {
+                response = new ApiResponse(404, "Account not yet registered , Please register");
+                return NotFound(response);
+            }
+
+            var userEmail = email.ToString().ToLower();
+            //generate otp
+            OtpLog userOtp = Utility.Utility.NewOtpLog(userEmail);
+            //save otp to database
+            bool otpResult = await _otpLogService.AddOtp(userOtp);
+
+            if (otpResult)
+            {
+                var message = new Message(new string[] { userEmail }, "Reset Password", "Rest  your password using otp: " + userOtp.Otp);
+                _emailService.SendEmail(message);
+                response = new ApiResponse(200, "OTP Generated successfully", "OTP to reset password has been sent to: " + userEmail);
+                return Ok(response);
+            }
+
+            response = new ApiResponse(400, "An error occured, try Again");
+            return BadRequest(response);
+        }
+
+
+        //POST api/users/password
+        //Reset Password
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [HttpPut("password", Name = "ResetPassword")]
+        public async Task<IActionResult> password([FromBody] ResetPassword resetPassword)
+        {
+            ApiResponse response;
+
+            var otp = resetPassword.Otp;
+            var password = BC.HashPassword(resetPassword.NewPassword);
+            var email = resetPassword.Email.ToString().ToLower();
+
+            var isOtpValid = await _otpLogService.IsOtpValid(email, otp);
+
+            if (isOtpValid)
+            {
+                var result = await _usersService.ResetPassword(email, password);
+                
+                if (result)
+                {
+
+                    //add audit log
+                    AuditLog auditLog = Utility.Utility.AddAuditLog(email, "Reset Password Detail");
+                    _auditLogService.AddAuditLog(auditLog);
+
+                    response = new ApiResponse(200, "Your Password has been updated");
+                    return Ok(response);
+
+                }
+                else
+                {
+                    response = new ApiResponse(400, "An error occurred, Please Request for New Password Reset OTP");
+                    return BadRequest(response);
+                }
+
+            }
+            else
+            {
+                response = new ApiResponse(400, "An error occured, Request for New Password reset OTP");
+                return BadRequest(response);
+            }
+
+        }
     }
 }

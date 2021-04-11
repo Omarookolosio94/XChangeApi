@@ -60,7 +60,6 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
-
         public async Task<bool> IsOtpValid(string email , string otp)
         {
             try

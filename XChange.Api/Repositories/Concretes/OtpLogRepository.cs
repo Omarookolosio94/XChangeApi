@@ -39,7 +39,7 @@ namespace XChange.Api.Repositories.Concretes
         {
             try
             {
-                return Query().Where(o => o.Email == email).FirstOrDefault();
+                return Query().Where(o => o.Email == email).LastOrDefault();
 
             }
             catch (Exception ex)
@@ -84,7 +84,7 @@ namespace XChange.Api.Repositories.Concretes
         {
             try
             {
-                OtpLog userOtp = Query().Where(o => o.Email.ToString().ToLower() == email.ToString().ToLower() && o.Otp.ToString() == otp.ToString()).FirstOrDefault();
+                OtpLog userOtp = Query().Where(o => o.Email.ToString().ToLower() == email.ToString().ToLower() && o.Otp.ToString() == otp.ToString()).LastOrDefault();
 
                 if (userOtp != null)
                 {
@@ -113,7 +113,6 @@ namespace XChange.Api.Repositories.Concretes
                 throw;
             }
         }
-
     }
 
 }

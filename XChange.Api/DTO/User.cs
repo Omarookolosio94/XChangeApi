@@ -8,11 +8,15 @@ namespace XChange.Api.DTO
 {
     public class User
     {
-        public string UserFirstName { get; set; }
-        public string UserLastName { get; set; }
         public string UserType { get; set; }
         public string Password { get; set; }
-        public string Gender { get; set; }
         public string Email { get; set; }
+    }
+
+    public class UserUpdate
+    {
+        public string UserFirstName { get; set; }
+        public string UserLastName { get; set; }
+        public string Gender { get; set; }
     }
 }

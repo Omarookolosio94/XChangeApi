@@ -16,9 +16,9 @@ namespace XChange.Api.Models
         }
 
         public virtual DbSet<Address> Address { get; set; }
+        public virtual DbSet<AuditLog> AuditLog { get; set; }
         public virtual DbSet<Buyers> Buyers { get; set; }
         public virtual DbSet<CreditCards> CreditCards { get; set; }
-        public virtual DbSet<Departments> Departments { get; set; }
         public virtual DbSet<Discounts> Discounts { get; set; }
         public virtual DbSet<GiftCards> GiftCards { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
@@ -82,9 +82,30 @@ namespace XChange.Api.Models
                 entity.Property(e => e.UserId).HasColumnName("UserID");
             });
 
+            modelBuilder.Entity<AuditLog>(entity =>
+            {
+                entity.Property(e => e.AuditLogId).HasColumnName("AuditLogID");
+
+                entity.Property(e => e.Activity).HasColumnType("text");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TimeLogged)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+            });
+
             modelBuilder.Entity<Buyers>(entity =>
             {
                 entity.HasKey(e => e.BuyerId);
+
+                entity.HasIndex(e => e.Email)
+                    .HasName("UQ__Buyers__A9D10534E21914AA")
+                    .IsUnique();
 
                 entity.Property(e => e.BuyerId).HasColumnName("BuyerID");
 
@@ -97,12 +118,14 @@ namespace XChange.Api.Models
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
-                entity.Property(e => e.FullName)
+                entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
-                entity.Property(e => e.IsLoggedIn).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(45)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.LastName)
                     .IsRequired()
@@ -142,24 +165,6 @@ namespace XChange.Api.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
-            });
-
-            modelBuilder.Entity<Departments>(entity =>
-            {
-                entity.HasKey(e => e.DepartmentId);
-
-                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
-
-                entity.Property(e => e.ContactFullName).HasColumnType("text");
-
-                entity.Property(e => e.DepartmentDescription)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DepartmentName)
-                    .IsRequired()
-                    .HasMaxLength(45)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Discounts>(entity =>
@@ -266,7 +271,6 @@ namespace XChange.Api.Models
                     .HasMaxLength(50);
 
                 entity.Property(e => e.IsSent)
-                    .IsRequired()
                     .HasColumnName("Is_Sent")
                     .HasDefaultValueSql("((1))");
 
@@ -306,10 +310,6 @@ namespace XChange.Api.Models
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
-                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
-
-                entity.Property(e => e.Idsku).HasColumnName("IDSKU");
-
                 entity.Property(e => e.Picture)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -321,6 +321,8 @@ namespace XChange.Api.Models
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SellerId).HasColumnName("SellerID");
+
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 0)");
             });
 
@@ -328,15 +330,13 @@ namespace XChange.Api.Models
             {
                 entity.Property(e => e.RegistrationLogId).HasColumnName("RegistrationLogID");
 
-                entity.Property(e => e.Error).HasColumnType("text");
-
-                entity.Property(e => e.Gender)
-                    .HasMaxLength(45)
+                entity.Property(e => e.Email)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.IsSuccessful)
-                    .HasColumnName("isSuccessful")
-                    .HasDefaultValueSql("((0))");
+                entity.Property(e => e.Error).HasColumnType("text");
+
+                entity.Property(e => e.IsSuccessful).HasColumnName("isSuccessful");
 
                 entity.Property(e => e.Password)
                     .HasMaxLength(100)
@@ -346,12 +346,8 @@ namespace XChange.Api.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UserFirstName).HasColumnType("text");
-
-                entity.Property(e => e.UserLastName).HasColumnType("text");
-
                 entity.Property(e => e.UserType)
-                    .HasMaxLength(45)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
             });
 
@@ -378,7 +374,7 @@ namespace XChange.Api.Models
                 entity.HasKey(e => e.SellerId);
 
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Sellers__A9D10534ED0250D5")
+                    .HasName("UQ__Sellers__A9D10534E8D5F22D")
                     .IsUnique();
 
                 entity.Property(e => e.SellerId).HasColumnName("SellerID");
@@ -407,11 +403,9 @@ namespace XChange.Api.Models
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
-                entity.Property(e => e.IsLoggedIn).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Logo).HasColumnType("text");
 
-                entity.Property(e => e.Logo)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.Property(e => e.MembershipId).HasColumnName("MembershipID");
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
             });
@@ -450,6 +444,10 @@ namespace XChange.Api.Models
             {
                 entity.HasKey(e => e.UserId);
 
+                entity.HasIndex(e => e.Email)
+                    .HasName("UQ__Users__A9D1053416BE8642")
+                    .IsUnique();
+
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.Property(e => e.DateRegistered)
@@ -458,10 +456,6 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.Email)
                     .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Gender)
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
@@ -469,15 +463,7 @@ namespace XChange.Api.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.UserFirstName)
-                    .IsRequired()
-                    .HasMaxLength(45)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserLastName)
-                    .IsRequired()
-                    .HasMaxLength(45)
-                    .IsUnicode(false);
+                entity.Property(e => e.Photo).HasColumnType("text");
 
                 entity.Property(e => e.UserType)
                     .IsRequired()
@@ -491,9 +477,7 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.Error).HasColumnType("text");
 
-                entity.Property(e => e.IsSuccessful)
-                    .HasColumnName("isSuccessful")
-                    .HasDefaultValueSql("((0))");
+                entity.Property(e => e.IsSuccessful).HasColumnName("isSuccessful");
 
                 entity.Property(e => e.TimeLogged)
                     .HasColumnType("datetime")

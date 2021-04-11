@@ -13,7 +13,7 @@ namespace XChange.Api.Models
         public int Phone { get; set; }
         public string Email { get; set; }
         public string Logo { get; set; }
-        public bool? IsLoggedIn { get; set; }
         public int UserId { get; set; }
+        public int MembershipId { get; set; }
     }
 }
