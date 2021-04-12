@@ -57,5 +57,28 @@ namespace Utilities.Validation
             }
         }
 
+        public static string GenerateOTP(int otpDigits = 6)
+        {
+            string number = "0123456789";
+            int length = number.Length;
+            string otp = string.Empty;
+            //int otpDigits = 5;
+            string finalDigits;
+            int getIndex;
+
+            for(int i =0; i< otpDigits; i++)
+            {
+                do
+                {
+                    getIndex = new Random().Next(0, length);
+                    finalDigits = number.ToCharArray()[getIndex].ToString();
+                     
+                } while (otp.IndexOf(finalDigits)!=-1);
+                otp += finalDigits;
+            }
+
+            return otp;
+        }
+
     }
 }

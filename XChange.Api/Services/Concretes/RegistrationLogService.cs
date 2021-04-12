@@ -23,9 +23,11 @@ namespace XChange.Api.Services.Concretes
             try
             {
                  _registrationLogRepository.AddRegistrationLog(registrationLog);
+                return;
             }
             catch (Exception ex)
             {
+                return;
             }
         }
 

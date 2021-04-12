@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>XChange.Api</name>
+    </assembly>
+    <members>
+        <member name="M:XChange.Api.Controllers.UsersController.users">
+            <summary>
+            Get details of all registered users
+            </summary>
+            <returns>List of all users</returns>
+            <response code="200">List of all users with hashed passwords</response>
+            <response code="500">Server error message</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.UsersController.Users(XChange.Api.DTO.User)">
+             <summary>
+             Creates a new user
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST api/users
+                 
+                 {
+                    "Email": "test@gmail.com",
+                    "UserType": "B",
+                    "Password": "testuser"
+                 }
+            
+             </remarks>
+             <returns>Success message</returns>
+             <response code="200">Registration success message , sends email to user</response>
+             <response code="400">Pass in required information , error list</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.UsersController.GetUser(System.Int32)">
+            <summary>
+            Get single user 
+            </summary>
+            <returns>Details of user</returns>
+            <response code="200">Details of user with hashed password</response>
+            <response code="404">user not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.UsersController.Otp(XChange.Api.DTO.OtpVerify)">
+             <summary>
+             Verify Otp issued to user
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST api/users/otp
+                 
+                 {
+                    "Email": "test@gmail.com",
+                    "Otp": "123456",
+                 }
+            
+             </remarks>
+             <returns>Success message</returns>
+             <response code="200">Your account has been verified  successfully</response>
+             <response code="400">An error occurred, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.UsersController.Otp(System.String)">
+            <summary>
+            Generate Otp for user
+            </summary>
+            <returns>Otp generation success message</returns>
+            <response code="200">Otp success , validation Otp sent to user email</response>
+            <response code="400">One or more error occured, request for new Otp</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.UsersController.Password(System.String)">
+            <summary>
+            Reset Password ,sends reset Otp to user
+            </summary>
+            <returns>Password reset otp generation success message</returns>
+            <response code="200">Otp success , password reset Otp sent to user email</response>
+            <response code="400">One or more error occured, request for new Otp</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.UsersController.Password(XChange.Api.DTO.ResetPassword)">
+             <summary>
+             Reset password
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 PUT api/users/password
+                 
+                 {
+                    "Email": "test@gmail.com",
+                    "Otp": "123456",
+                    "NewPassword": "newtest"
+                 }
+            
+             </remarks>
+             <returns>Success message</returns>
+             <response code="200">Your password has been updated</response>
+             <response code="400">An error occurred, request for new password reset Otp</response>
+        </member>
+    </members>
+</doc>

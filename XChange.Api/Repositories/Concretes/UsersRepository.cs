@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities.Logger;
+using XChange.Api.DTO;
 using XChange.Api.Models;
 using XChange.Api.Repositories.Interfaces;
 using XChange.Api.Services.Concretes;
@@ -16,10 +19,16 @@ namespace XChange.Api.Repositories.Concretes
     {
 
         private static string ModuleName = "UsersRepository";
+        private readonly IRegistrationLogService _registrationLogService;
+        private readonly XChangeDatabaseContext dbGeneralContext = new XChangeDatabaseContext();
+
+
 
         public UsersRepository(XChangeDatabaseContext dbContext)
         {
             _dbContext = dbContext;
+            _registrationLogService = new RegistrationLogService(new RegistrationLogRepository(dbGeneralContext));
+
         }
 
         public async Task<bool> RegisterUser(Users user)
@@ -32,6 +41,19 @@ namespace XChange.Api.Repositories.Concretes
             }
             catch (Exception ex)
             {
+                User logUser = new User
+                {
+                    Email = user.Email,
+                    Password = user.Password,
+                    UserType = user.UserType
+                };
+
+                //log exception
+                new Logger().LogError(ModuleName, "RegisterUser", "Error Registering User" + user + ex + "\n");
+
+                RegistrationLog registrationSuccessLog = Utility.Utility.AddRegistrationLog(logUser, false, ex.Message.ToString());
+                _registrationLogService.AddRegistrationLog(registrationSuccessLog);
+
                 throw;
             }
         }
@@ -50,6 +72,55 @@ namespace XChange.Api.Repositories.Concretes
             }
         }
 
+        public async Task<Users> GetUserByEmail(string email)
+        {
+            try
+            {
+                var user = Query().Where(o => o.Email.ToLower() == email.ToLower()).FirstOrDefault();
+                Users result = new Users{};
+
+                if (user != null)
+                {
+                    return result = user;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "GetUserByEmail", "Error Fetching User By Email" + email + "exception error: " +  ex + "\n");
+                throw;
+            }
+        }
+
+
+            /*
+        public async Task<List<CustomerSMELimit>> GetAllCustomerUPLLimitandBySearchParam(string searchParam)
+        {
+            try
+            {
+                var _queryList = new List<CustomerSMELimit>();
+                var _query = Query().ToList();
+                if (!string.IsNullOrEmpty(searchParam))
+                {
+                    if (_query != null)
+                    {
+                        _queryList = _query = _query.Where(x => x.BVN == searchParam
+                                                || x.ACCOUNT_NO == searchParam).ToList();
+                    }
+                }
+                _queryList = _query.AsQueryable().ToList();
+                return _queryList.ToList();
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "GetAllCustomerUPLLimitandBySearchParam", "Error Getting All CustomerUPLLimit" + ex + "\n");
+                throw;
+            }
+        }
+        */
+
+
         public async Task<List<Users>> GetUsers()
         {
             try
@@ -59,7 +130,7 @@ namespace XChange.Api.Repositories.Concretes
             }
             catch (Exception ex)
             {
-                new Logger().LogError(ModuleName, "GetUsers", "Error Fetching All Users"  + ex + "\n");
+                new Logger().LogError(ModuleName, "GetUsers", "Error Fetching All Users" + ex + "\n");
                 throw;
             }
         }
@@ -86,6 +157,22 @@ namespace XChange.Api.Repositories.Concretes
                 throw;
             }
         }
+
+        public async Task<bool> UpdateUser(Users user)
+        {
+            try
+            {
+                Update(user);
+                await Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "UpdateUser", "Error Updating User " + user.UserId + " exception error: "+ ex + "/n");
+                throw;
+            }
+        }
+
 
 
     }

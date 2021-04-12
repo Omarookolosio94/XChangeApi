@@ -13,8 +13,6 @@ namespace XChange.Data.Services.Concretes
     public class UsersService : IUsersService
     {
         private readonly IUsersRepository _usersRepository;
-        private readonly IRegistrationLogRepository _registrationLogRepository;
-        //private static string ModuleName = "UsersService";
 
         public UsersService(IUsersRepository usersRepository )
         {
@@ -50,6 +48,20 @@ namespace XChange.Data.Services.Concretes
             }
         }
 
+        public async Task<Users> GetUserByEmail(string email)
+        {
+            try
+            {
+                var status = await _usersRepository.GetUserByEmail(email);
+                return status;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
         public async Task<List<Users>> GetUsers()
         {
             try
@@ -63,8 +75,6 @@ namespace XChange.Data.Services.Concretes
             }
         }
 
-
-
         public async Task<bool> IsEmailRegistered(string email)
         {
             try
@@ -76,8 +86,80 @@ namespace XChange.Data.Services.Concretes
             catch (Exception ex)
             {
                 throw;
-
+                  
             }
         }
+
+        /*
+        public async Task<bool> UpdateUser(int userId, Users user)
+        {
+            try
+            {
+                Users updateUser = await _usersRepository.GetUser(userId);
+                bool result = false;
+
+                if(updateUser != null)
+                {
+                    updateUser.UserFirstName = user.UserFirstName;
+                    updateUser.UserLastName = user.UserLastName;
+                    updateUser.Gender = user.Gender;
+                    //updateUser.Password = user.Password;
+                    //updateUser.Email = user.Email;
+
+                   return result = await _usersRepository.UpdateUser(updateUser);
+                }
+                 
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+    */
+
+        public async Task<bool> VerifyUser(int userId, bool isVerified)
+        {
+            try
+            {
+                Users user = await _usersRepository.GetUser(userId);
+                bool result = false;
+
+                if (user != null)
+                {
+                    user.IsVerified = isVerified;
+                    result = await _usersRepository.UpdateUser(user);
+                } 
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> ResetPassword(string email ,string password)
+        {
+            try
+            {
+                bool result = false;
+                Users user = await _usersRepository.GetUserByEmail(email);
+
+                if (user != null)
+                {
+                    user.Password = password;
+                    result = await _usersRepository.UpdateUser(user);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
     }
 }

@@ -42,7 +42,7 @@ namespace XChange.Api.Services.Concretes
             string MailText = str.ReadToEnd();
             str.Close();
 
-            MailText = MailText.Replace("[content]" , message.Content);
+            MailText = MailText.Replace("[content]" , message.Content).Replace("[heading]", message.Subject); ;
 
             var builder = new BodyBuilder();
             builder.HtmlBody = MailText;
