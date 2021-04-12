@@ -32,3 +32,5 @@ C:\Users\A240990\Source\XChangeApi\XChange.Api\obj\Debug\netcoreapp2.1\XChange.A
 C:\Users\A240990\Source\XChangeApi\XChange.Api\obj\Debug\netcoreapp2.1\XChange.Api.csproj.CopyComplete
 C:\Users\A240990\Source\XChangeApi\XChange.Api\obj\Debug\netcoreapp2.1\XChange.Api.dll
 C:\Users\A240990\Source\XChangeApi\XChange.Api\obj\Debug\netcoreapp2.1\XChange.Api.pdb
+C:\Users\A240990\source\XChangeApi\XChange.Api\bin\Debug\netcoreapp2.1\XChange.Api.xml
+C:\Users\A240990\source\XChangeApi\XChange.Api\obj\Debug\netcoreapp2.1\XChange.Api.xml

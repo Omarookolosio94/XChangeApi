@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using System;
+using System.IO;
+using System.Reflection;
 using XChange.Api.DTO;
 using XChange.Api.Extensions;
 using XChange.Api.Services.Concretes;
@@ -34,9 +37,34 @@ namespace XChange.Api
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+           
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "XChange.Api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "XChange.Api",
+                    Description = "ECommerce API for XChange.com",
+                    //TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Oghenemaro Okolosio",
+                        Email = string.Empty,
+                        Url = new Uri("https://oghenemaro.com"),
+                    }
+                    /*
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use under LICX",
+                        //Url = new Uri("https://example.com/license"),
+                    }
+                    */
+                });
+
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

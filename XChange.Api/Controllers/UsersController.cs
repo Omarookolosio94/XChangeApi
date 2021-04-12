@@ -12,6 +12,7 @@ using XChange.Data.Services.Concretes;
 using BC = BCrypt.Net.BCrypt;
 using static XChange.Api.DTO.ModelError;
 using XChange.Api.Services.Concretes;
+using Microsoft.AspNetCore.Http;
 
 namespace XChange.Api.Controllers
 {
@@ -39,10 +40,15 @@ namespace XChange.Api.Controllers
 
         }
 
-        //GET api/users
-        //Get all users
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
+      
+        /// <summary>
+        /// Get details of all registered users
+        /// </summary>
+        /// <returns>List of all users</returns>
+        /// <response code="200">List of all users with hashed passwords</response>
+        /// <response code="500">Server error message</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
         public IActionResult users()
         {
@@ -62,19 +68,36 @@ namespace XChange.Api.Controllers
             }
             else
             {
-                response = new ApiResponse(404, "No User Found");
+                response = new ApiResponse(500, "An error ocurred, please try again");
                 return NotFound(response);
             }
 
         }
 
-        //POST api/users
-        //create a new user
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
+        
+        /// <summary>
+        /// Creates a new user
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST api/users
+        ///     
+        ///     {
+        ///        "Email": "test@gmail.com",
+        ///        "UserType": "B",
+        ///        "Password": "testuser"
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>Success message</returns>
+        /// <response code="200">Registration success message , sends email to user</response>
+        /// <response code="400">Pass in required information , error list</response>
         [HttpPost]
-        public async Task<IActionResult> users([FromBody] User user)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
+        public async Task<IActionResult> Users([FromBody] User user)
 
         {
             ModelError errors;
@@ -272,12 +295,18 @@ namespace XChange.Api.Controllers
             }
         }
 
-        //GET api/users/{userId}
-        //Get Single User
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
+      
+        /// <summary>
+        /// Get single user 
+        /// </summary>
+        /// <returns>Details of user</returns>
+        /// <response code="200">Details of user with hashed password</response>
+        /// <response code="404">user not found</response>
         [HttpGet("{userId}", Name = "GetUser")]
-        public IActionResult getUser(int userId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/json")]
+        public IActionResult GetUser(int userId)
         {
 
             var result = _usersService.GetUser(userId);
@@ -292,18 +321,33 @@ namespace XChange.Api.Controllers
             }
             else
             {
-                response = new ApiResponse(404, "Not Found");
+                response = new ApiResponse(404, "User not found");
                 return NotFound(response);
             }
 
         }
-
-        //POST api/users/otp
-        //Verify Otp issued to user 
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
+ 
+        /// <summary>
+        /// Verify Otp issued to user
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST api/users/otp
+        ///     
+        ///     {
+        ///        "Email": "test@gmail.com",
+        ///        "Otp": "123456",
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>Success message</returns>
+        /// <response code="200">Your account has been verified  successfully</response>
+        /// <response code="400">An error occurred, please try again</response>
         [HttpPost("otp", Name = "VerifyOtp")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
         public async Task<IActionResult> Otp([FromBody] OtpVerify otpVerify)
         {
 
@@ -330,7 +374,7 @@ namespace XChange.Api.Controllers
                 }
                 else
                 {
-                    response = new ApiResponse(404, "An error occurred, Please Try Again");
+                    response = new ApiResponse(400, "An error occurred, Please Try Again");
                     return NotFound(response);
                 }
 
@@ -344,12 +388,17 @@ namespace XChange.Api.Controllers
         }
 
 
-        //GET api/users/otp
-        //Generate Otp for user
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        //[ProducesResponseType(404)]
+       
+        /// <summary>
+        /// Generate Otp for user
+        /// </summary>
+        /// <returns>Otp generation success message</returns>
+        /// <response code="200">Otp success , validation Otp sent to user email</response>
+        /// <response code="400">One or more error occured, request for new Otp</response>
         [HttpGet("otp", Name = "GenerateOtp")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
         public async Task<IActionResult> Otp(string email)
         {
             ApiResponse response;
@@ -373,7 +422,7 @@ namespace XChange.Api.Controllers
             bool isUserRegistered = await _usersService.IsEmailRegistered(email);
             if (!isUserRegistered)
             {
-                response = new ApiResponse(404, "Account not yet registered , Please register");
+                response = new ApiResponse(400, "Account not yet registered , Please register");
                 return NotFound(response);
             }
 
@@ -398,13 +447,18 @@ namespace XChange.Api.Controllers
         }
 
 
-        //GET api/users/password
-        //Reset Password ,sends reset OTP to user
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        //[ProducesResponseType(404)]
+      
+        /// <summary>
+        /// Reset Password ,sends reset Otp to user
+        /// </summary>
+        /// <returns>Password reset otp generation success message</returns>
+        /// <response code="200">Otp success , password reset Otp sent to user email</response>
+        /// <response code="400">One or more error occured, request for new Otp</response>
         [HttpGet("password", Name = "ResetPasswordOTP")]
-        public async Task<IActionResult> password(string email)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
+        public async Task<IActionResult> Password(string email)
         {
             ApiResponse response;
 
@@ -428,7 +482,7 @@ namespace XChange.Api.Controllers
 
             if (!isUserRegistered)
             {
-                response = new ApiResponse(404, "Account not yet registered , Please register");
+                response = new ApiResponse(400, "Account not yet registered , Please register");
                 return NotFound(response);
             }
 
@@ -451,12 +505,30 @@ namespace XChange.Api.Controllers
         }
 
 
-        //POST api/users/password
-        //Reset Password
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
+ 
+        /// <summary>
+        /// Reset password
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT api/users/password
+        ///     
+        ///     {
+        ///        "Email": "test@gmail.com",
+        ///        "Otp": "123456",
+        ///        "NewPassword": "newtest"
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>Success message</returns>
+        /// <response code="200">Your password has been updated</response>
+        /// <response code="400">An error occurred, request for new password reset Otp</response>
         [HttpPut("password", Name = "ResetPassword")]
-        public async Task<IActionResult> password([FromBody] ResetPassword resetPassword)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
+        public async Task<IActionResult> Password([FromBody] ResetPassword resetPassword)
         {
             ApiResponse response;
 
