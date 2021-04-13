@@ -4,6 +4,14 @@
         <name>XChange.Api</name>
     </assembly>
     <members>
+        <member name="M:XChange.Api.Controllers.AccountController.account(System.String)">
+            <summary>
+            Get account based on user type:  Buyers and Sellers
+            </summary>
+            <returns>Details of user</returns>
+            <response code="200">Details of user with hashed password</response>
+            <response code="404">user not found</response>
+        </member>
         <member name="M:XChange.Api.Controllers.UsersController.users">
             <summary>
             Get details of all registered users
