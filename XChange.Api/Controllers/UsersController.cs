@@ -84,9 +84,9 @@ namespace XChange.Api.Controllers
         ///     POST api/users
         ///     
         ///     {
-        ///        "Email": "test@gmail.com",
+        ///        "Email": "johndoe@gmail.com",
         ///        "UserType": "B",
-        ///        "Password": "testuser"
+        ///        "Password": "johndoe_987"
         ///     }
         ///
         /// </remarks>
@@ -98,68 +98,10 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
         public async Task<IActionResult> Users([FromBody] User user)
-
         {
             ModelError errors;
             List<Error> errorList = new List<Error> { };
             bool dataValid = true;
-
-            /*
-            //Validate First Name
-            if (Validation.IsNull(user.UserFirstName))
-            {
-                Error err = new Error
-                {
-                    modelName = "UserFirstName",
-                    modelErrorMessgae = "First Name is Required",
-                };
-
-                errorList.Add(err);
-                dataValid = false;
-            }
-
-            //Validate FirstName Length
-            if (!Validation.IsNull(user.UserFirstName) && user.UserFirstName.Length > 40)
-            {
-                Error err = new Error
-                {
-                    modelName = "UserFirstName",
-                    modelErrorMessgae = "First Name should be less than or equal to 40",
-                };
-
-                errorList.Add(err);
-                dataValid = false;
-
-            }
-
-            //Validate Last Name
-            if (Validation.IsNull(user.UserLastName))
-            {
-                Error err = new Error
-                {
-                    modelName = "UserLastName",
-                    modelErrorMessgae = "Last Name is Required",
-                };
-
-                errorList.Add(err);
-                dataValid = false;
-
-            }
-
-            //Validate FirstName Length
-            if (!Validation.IsNull(user.UserLastName) && user.UserLastName.Length > 40)
-            {
-                Error err = new Error
-                {
-                    modelName = "UserLastName",
-                    modelErrorMessgae = "Last Name should be less than or equal to 40",
-                };
-
-                errorList.Add(err);
-                dataValid = false;
-
-            }
-            */
 
             //Validate User Type
             if (Validation.IsNull(user.UserType) || user.UserType.Length > 1 || !user.UserType.ToString().ToLower().Intersect("bs").Any())
@@ -249,13 +191,6 @@ namespace XChange.Api.Controllers
                 UserType = user.UserType.ToUpper(),
                 Email = user.Email.ToString().ToLower(),
             };
-
-            /*
-            if (!Validation.IsNull(newUser.Gender))
-            {
-                newUser.Gender = newUser.Gender.ToUpper();
-            }
-            */
 
             var result = await _usersService.RegisterUser(newUser);
 

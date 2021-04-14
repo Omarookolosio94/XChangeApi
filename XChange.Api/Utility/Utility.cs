@@ -54,6 +54,20 @@ namespace XChange.Api.Utility
             return auditLog;
         }
 
+        public static AuditLog AddAuditLog(int userId, string email, string activity = " ")
+        {
+
+            AuditLog auditLog = new AuditLog
+            {
+                Activity = activity,
+                Email = email,
+                TimeLogged = DateTime.Now,
+                UserId = userId
+            };
+
+            return auditLog;
+        }
+
         public static OtpLog NewOtpLog(string email , int otpLength = 6)
         {
             var otp = Utilities.Validation.Validation.GenerateOTP(otpLength);

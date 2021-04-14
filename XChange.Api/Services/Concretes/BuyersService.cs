@@ -73,6 +73,7 @@ namespace XChange.Api.Services.Concretes
                     updateBuyer.FirstName = buyer.FirstName;
                     updateBuyer.LastName = buyer.LastName;
                     updateBuyer.Phone = buyer.Phone;
+                    updateBuyer.CompanyName = buyer.CompanyName;
 
                     result = await _buyersRepository.UpdateBuyer(updateBuyer);
                 }
@@ -84,5 +85,26 @@ namespace XChange.Api.Services.Concretes
                 throw;
             }
         }
+
+        public async Task<bool> IsBuyerRegistered(int userId)
+        {
+            try
+            {
+                bool result = false;
+                Buyers buyer = await _buyersRepository.GetBuyer(userId);
+
+                if (buyer != null)
+                {
+                    result = true;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
+        }
+
     }
 }

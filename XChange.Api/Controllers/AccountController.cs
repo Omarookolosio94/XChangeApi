@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Utilities.Validation;
 using XChange.Api.DTO;
 using XChange.Api.Models;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
 using XChange.Data.Services.Concretes;
+using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
 {
@@ -21,7 +23,6 @@ namespace XChange.Api.Controllers
         private readonly XChangeDatabaseContext dbContext = new XChangeDatabaseContext();
         private readonly IUsersService _usersService;
         private readonly IBuyersService _buyersService;
-        private readonly ISellersService _sellersService;
         private readonly IAuditLogService _auditLogService;
 
 
@@ -30,75 +31,373 @@ namespace XChange.Api.Controllers
             _usersService = new UsersService(new UsersRepository(dbContext));
             _auditLogService = new AuditLogService(new AuditLogRepository(dbContext));
             _buyersService = new BuyersService(new BuyersRepository(dbContext));
-            _sellersService = new SellersService(new SellersRepository(dbContext));
         }
 
 
         /// <summary>
-        /// Get account based on user type:  Buyers and Sellers
+        /// Get account of all Buyers
         /// </summary>
-        /// <returns>Details of user</returns>
-        /// <response code="200">Details of user with hashed password</response>
-        /// <response code="404">user not found</response>
-        [HttpGet("{userType}", Name = "GetAccounts")]
+        /// <returns>Details of buyer</returns>
+        /// <response code="200">Details of all buyers</response>
+        /// <response code="404">Buyers not found</response>
+        [HttpGet(Name = "GetAccounts")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
-        public async Task<IActionResult> account(string userType)
+        public async Task<IActionResult> Account()
         {
+            var result = _buyersService.GetBuyers();
+            ApiResponse response;
 
-           // ApiResponse response;
-            
+            if (result.Result != null)
+            {
+                return Ok(result.Result);
+            }
+            else
+            {
+                response = new ApiResponse(500, "An error ocurred, please try again");
+                return NotFound(response);
+            }
 
-            if (userType.ToLower() == "s" || userType.ToLower() == "seller")
-            {
-                var result = await _sellersService.GetSellers();
-                return Ok(result);
-            }
-            else 
-            {
-                var result = await _buyersService.GetBuyers();
-                return Ok(result);
-            }
- 
         }
 
-        //POST api/account/{userType}/{userID}
-        //Create account for user
+        /// <summary>
+        /// Get account of a buyer
+        /// </summary>
+        /// <returns>Details of a buyer</returns>
+        /// <response code="200">Details of a buyer</response>
+        /// <response code="404">Buyer not found</response>
+        [HttpGet("{userId}", Name = "GetBuyer")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/json")]
+        public IActionResult GetBuyer(int userId)
+        {
+
+            var result = _buyersService.GetBuyer(userId);
+            ApiResponse response;
+
+            if (result.Result != null)
+            {
+                return Ok(result.Result);
+            }
+            else
+            {
+                response = new ApiResponse(404, "Account not found, Please Create one");
+                return NotFound(response);
+            }
+
+        }
 
 
-        //GET api/account/{userType}/{userID}
-        //Get account of a user
+        /// <summary>
+        /// Creates a new account for user
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST api/account/{userId}
+        ///     
+        ///     {
+        ///        FirstName : "John",
+        ///        LastName: "Doe",
+        ///        CompanyName: "Maxwell Enterprise Inc",
+        ///        Phone : "07019000010",
+        ///        Gender: "Male"
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>New Buyer's account</returns>
+        /// <response code="201">Newly created buyer's account</response>
+        /// <response code="400">Pass in required information , create a seller account, account already exists</response>
+        /// <response code="404">User's profile not found</response>
+        [HttpPost("{userId}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/json")]
+        public async Task<IActionResult> Account(int userId, [FromBody] Buyer buyer)
+        {
+            ModelError errors;
+            List<Error> errorList = new List<Error> { };
+            ApiResponse response;
+            bool dataValid = true;
+
+            //get user details
+            Users user = await _usersService.GetUser(userId);
+
+            if (user == null)
+            {
+                response = new ApiResponse(404, "User profile not found");
+                return NotFound(response);
+            }
+
+            if (user.UserType.ToUpper() == "S")
+            {
+                response = new ApiResponse(400, "Please, create a seller's account");
+                return BadRequest(response);
+            }
+
+            var isRegistered = await _buyersService.IsBuyerRegistered(userId);
+
+            //check if user has an account already
+            if (isRegistered)
+            {
+                response = new ApiResponse(400, "Account already exist");
+                return BadRequest(response);
+            }
+
+            //Validate First Name
+            if (Validation.IsNull(buyer.FirstName))
+            {
+                Error err = new Error
+                {
+                    modelName = "FirstName",
+                    modelErrorMessgae = "First Name is Required",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+            }
+
+            //Validate FirstName Length
+            if (!Validation.IsNull(buyer.FirstName) && buyer.FirstName.Length > 40)
+            {
+                Error err = new Error
+                {
+                    modelName = "FirstName",
+                    modelErrorMessgae = "First Name should be less than or equal to 40",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+
+            }
+
+            //Validate Last Name
+            if (Validation.IsNull(buyer.LastName))
+            {
+                Error err = new Error
+                {
+                    modelName = "LastName",
+                    modelErrorMessgae = "Last Name is Required",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+
+            }
+
+            //Validate LastName Length
+            if (!Validation.IsNull(buyer.LastName) && buyer.LastName.Length > 40)
+            {
+                Error err = new Error
+                {
+                    modelName = "LastName",
+                    modelErrorMessgae = "Last Name should be less than or equal to 40",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+
+            }
+
+            //Pass Error Response
+            if (!dataValid)
+            {
+                errors = new ModelError(400, "Pass in Required Information", errorList);
+                return BadRequest(errors);
+            }
 
 
+            //create Buyer model
+            Buyers newBuyer = new Buyers
+            {
+                FirstName = buyer.FirstName,
+                LastName = buyer.LastName,
+                CompanyName = buyer.CompanyName,
+                Gender = buyer.Gender,
+                Phone = buyer.Phone,
+                Email = user.Email,
+                MembershipId = 1,
+                UserId = userId
+            };
 
-        //PUT api/account/{userType}/{userID}
-        //update account for user
-
-
-
-        //GET api/account/address
-        //Get address of all users
-
-
-        //GET api/account/address?searchBy=searchWord
-        //Search for a given address
-
-
-        //GET api/account/{userID}/address
-        //Get all address by a user
-
-
-        //GET api/account/{userID}/address/{addressID}
-        //Get a single address
+            if (!Validation.IsNull(newBuyer.Gender))
+            {
+                newBuyer.Gender = newBuyer.Gender.ToUpper();
+            }
 
 
+            var result = await _buyersService.AddBuyer(newBuyer);
 
-        //POST api/account/{userID}/address
-        //add address for user
+            if (result)
+            {
+                //add audit log
+                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, newBuyer.Email, "Created Buyer's account");
+                _auditLogService.AddAuditLog(auditLog);
+
+                return CreatedAtRoute("GetBuyer", new { UserId = userId }, newBuyer);
+
+            }
+            else
+            {
+                response = new ApiResponse(400, "An error occurred , please try again");
+                return BadRequest(response);
+            }
+
+        }
 
 
-        //PUT api/account/{userID}/address?address=addressID
-        //update a given address
+        /// <summary>
+        /// Update account for user
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT api/account/{userId}
+        ///     
+        ///     {
+        ///        FirstName : "John",
+        ///        LastName: "Doe",
+        ///        CompanyName: "Maxwell Enterprise Inc",
+        ///        Phone : "07019000010",
+        ///        Gender: "Male"
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>Update Buyer's account</returns>
+        /// <response code="200">Account update successful</response>
+        /// <response code="400">Pass in required information , create a seller account</response>
+        /// <response code="404">User's profile not found</response>
+        [HttpPut("{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/json")]
+        public async Task<IActionResult> Account(int userId, [FromBody] UpdateBuyer buyer)
+        {
+            ModelError errors;
+            List<Error> errorList = new List<Error> { };
+            ApiResponse response;
+            bool dataValid = true;
+
+            //get user details
+            Users user = await _usersService.GetUser(userId);
+
+            if (user == null)
+            {
+                response = new ApiResponse(404, "User profile not found");
+                return NotFound(response);
+            }
+
+            if (user.UserType.ToUpper() == "S")
+            {
+                response = new ApiResponse(400, "Please, create a seller account");
+                return BadRequest(response);
+            }
+
+         
+            //Validate First Name
+            if (Validation.IsNull(buyer.FirstName))
+            {
+                Error err = new Error
+                {
+                    modelName = "FirstName",
+                    modelErrorMessgae = "First Name is Required",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+            }
+
+            //Validate FirstName Length
+            if (!Validation.IsNull(buyer.FirstName) && buyer.FirstName.Length > 40)
+            {
+                Error err = new Error
+                {
+                    modelName = "FirstName",
+                    modelErrorMessgae = "First Name should be less than or equal to 40",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+
+            }
+
+            //Validate Last Name
+            if (Validation.IsNull(buyer.LastName))
+            {
+                Error err = new Error
+                {
+                    modelName = "LastName",
+                    modelErrorMessgae = "Last Name is Required",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+
+            }
+
+            //Validate LastName Length
+            if (!Validation.IsNull(buyer.LastName) && buyer.LastName.Length > 40)
+            {
+                Error err = new Error
+                {
+                    modelName = "LastName",
+                    modelErrorMessgae = "Last Name should be less than or equal to 40",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+
+            }
+
+            //Pass Error Response
+            if (!dataValid)
+            {
+                errors = new ModelError(400, "Pass in Required Information", errorList);
+                return BadRequest(errors);
+            }
+
+
+            //create Buyer model
+            Buyers updateBuyer = new Buyers
+            {
+                FirstName = buyer.FirstName,
+                LastName = buyer.LastName,
+                CompanyName = buyer.CompanyName,
+                Gender = buyer.Gender,
+                Phone = buyer.Phone,
+            };
+
+            if (!Validation.IsNull(updateBuyer.Gender))
+            {
+                updateBuyer.Gender = updateBuyer.Gender.ToUpper();
+            }
+
+
+            var result = await _buyersService.UpdateBuyer(userId, updateBuyer);
+
+            if (result)
+            {
+                //add audit log
+                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, user.Email, "Updated Buyer's account");
+                _auditLogService.AddAuditLog(auditLog);
+
+
+                response = new ApiResponse(200, "Account update successful");
+                return Ok(response);
+
+            }
+            else
+            {
+                response = new ApiResponse(400, "An error occurred , please try again");
+                return BadRequest(response);
+            }
+
+        }
+
+
     }
 }

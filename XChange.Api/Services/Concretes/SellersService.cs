@@ -86,5 +86,26 @@ namespace XChange.Api.Services.Concretes
                 throw;
             }
         }
+
+        public async Task<bool> IsSellerRegistered(int userId)
+        {
+            try
+            {
+                bool result = false;
+                Sellers seller = await _sellersRepository.GetSeller(userId);
+
+                if (seller != null)
+                {
+                    result = true;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
+        }
+
     }
 }

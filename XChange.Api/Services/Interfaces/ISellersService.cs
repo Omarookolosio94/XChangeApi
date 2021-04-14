@@ -12,5 +12,6 @@ namespace XChange.Api.Services.Interfaces
         Task<List<Sellers>> GetSellers();
         Task<Sellers> GetSeller(int userId);
         Task<bool> UpdateSeller(int userId, Sellers seller);
+        Task<bool> IsSellerRegistered(int userId);
     }
 }

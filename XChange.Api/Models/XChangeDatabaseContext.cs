@@ -41,7 +41,7 @@ namespace XChange.Api.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=XChangeDatabase;Integrated Security=True;");
             }
         }
@@ -133,6 +133,8 @@ namespace XChange.Api.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.MembershipId).HasColumnName("MembershipID");
+
+                entity.Property(e => e.Phone).HasColumnType("text");
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
             });
@@ -407,6 +409,10 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.MembershipId).HasColumnName("MembershipID");
 
+                entity.Property(e => e.Phone)
+                    .IsRequired()
+                    .HasColumnType("text");
+
                 entity.Property(e => e.UserId).HasColumnName("UserID");
             });
 
@@ -420,6 +426,10 @@ namespace XChange.Api.Models
                     .IsRequired()
                     .HasMaxLength(45)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Phone)
+                    .IsRequired()
+                    .HasColumnType("text");
 
                 entity.Property(e => e.ShipperName)
                     .IsRequired()

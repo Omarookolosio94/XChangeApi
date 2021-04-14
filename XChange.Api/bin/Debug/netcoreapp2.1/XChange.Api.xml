@@ -4,13 +4,131 @@
         <name>XChange.Api</name>
     </assembly>
     <members>
-        <member name="M:XChange.Api.Controllers.AccountController.account(System.String)">
+        <member name="M:XChange.Api.Controllers.AccountController.Account">
             <summary>
-            Get account based on user type:  Buyers and Sellers
+            Get account of all Buyers
             </summary>
-            <returns>Details of user</returns>
-            <response code="200">Details of user with hashed password</response>
-            <response code="404">user not found</response>
+            <returns>Details of buyer</returns>
+            <response code="200">Details of all buyers</response>
+            <response code="404">Buyers not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AccountController.GetBuyer(System.Int32)">
+            <summary>
+            Get account of a buyer
+            </summary>
+            <returns>Details of a buyer</returns>
+            <response code="200">Details of a buyer</response>
+            <response code="404">Buyer not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AccountController.Account(System.Int32,XChange.Api.DTO.Buyer)">
+             <summary>
+             Creates a new account for user
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST api/account/{userId}
+                 
+                 {
+                    FirstName : "John",
+                    LastName: "Doe",
+                    CompanyName: "Maxwell Enterprise Inc",
+                    Phone : "07019000010",
+                    Gender: "Male"
+                 }
+            
+             </remarks>
+             <returns>New Buyer's account</returns>
+             <response code="201">Newly created buyer's account</response>
+             <response code="400">Pass in required information , create a seller account, account already exists</response>
+             <response code="404">User's profile not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AccountController.Account(System.Int32,XChange.Api.DTO.UpdateBuyer)">
+             <summary>
+             Update account for user
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 PUT api/account/{userId}
+                 
+                 {
+                    FirstName : "John",
+                    LastName: "Doe",
+                    CompanyName: "Maxwell Enterprise Inc",
+                    Phone : "07019000010",
+                    Gender: "Male"
+                 }
+            
+             </remarks>
+             <returns>Update Buyer's account</returns>
+             <response code="200">Account update successful</response>
+             <response code="400">Pass in required information , create a seller account</response>
+             <response code="404">User's profile not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.SellerAccountController.SellerAccount">
+            <summary>
+            Get seller account of user
+            </summary>
+            <returns>Details of Seller</returns>
+            <response code="200">Details of all sellers</response>
+            <response code="404">seller not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.SellerAccountController.GetSeller(System.Int32)">
+            <summary>
+            Get account of a Seller
+            </summary>
+            <returns>Details of a seller</returns>
+            <response code="200">Details of a seller</response>
+            <response code="404">Seller not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.SellerAccountController.SellerAccount(System.Int32,XChange.Api.DTO.Seller)">
+             <summary>
+             Creates a new seller account for user
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST api/seller-account/{userId}
+                 
+                 {
+                    "CompanyName": "BookStores.com",
+                    "ContactFirtName": "Mariam",
+                    "ContactLastName": "Benedict",
+                    "ContactPosition":"Sales Admin",
+                    "Logo": " ",
+                    "Phone": " "
+                 }
+            
+             </remarks>
+             <returns>New seller's account</returns>
+             <response code="201">Newly created seller's account</response>
+             <response code="400">Pass in required information , create a seller account, account already exists</response>
+             <response code="404">User's profile not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.SellerAccountController.SellerAccount(System.Int32,XChange.Api.DTO.UpdateSeller)">
+             <summary>
+             Update seller-account for user
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 PUT api/seller-account/{userId}
+                 
+                 {
+                    "CompanyName": "BookStores.com",
+                    "ContactFirtName": "Mariam",
+                    "ContactLastName": "Benedict",
+                    "ContactPosition":"Sales Admin",
+                    "Logo": " ",
+                    "Phone": " "
+                 }
+            
+             </remarks>
+             <returns>Update Seller's account</returns>
+             <response code="200">Seller Account update successful</response>
+             <response code="400">Pass in required information , create a Buyer account</response>
+             <response code="404">User's profile not found</response>
         </member>
         <member name="M:XChange.Api.Controllers.UsersController.users">
             <summary>
@@ -30,9 +148,9 @@
                  POST api/users
                  
                  {
-                    "Email": "test@gmail.com",
+                    "Email": "johndoe@gmail.com",
                     "UserType": "B",
-                    "Password": "testuser"
+                    "Password": "johndoe_987"
                  }
             
              </remarks>
