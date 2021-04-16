@@ -107,5 +107,19 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
+
+        public async Task<List<Sellers>> SearchSellers(string searchParams)
+        {
+            try
+            {
+                var status = await _sellersRepository.SearchSellers(searchParams);
+                return status;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
     }
 }

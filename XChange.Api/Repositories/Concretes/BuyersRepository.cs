@@ -8,7 +8,7 @@ using XChange.Api.Repositories.Interfaces;
 
 namespace XChange.Api.Repositories.Concretes
 {
-    public class BuyersRepository : BaseRepository<Buyers> , IBuyersRepository
+    public class BuyersRepository : BaseRepository<Buyers>, IBuyersRepository
     {
 
         private static string ModuleName = "BuyersRepository";
@@ -29,9 +29,10 @@ namespace XChange.Api.Repositories.Concretes
                 await Commit();
                 return true;
 
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                new Logger().LogError(ModuleName, "AddBuyer", "Error Adding Buyer"  + ex + "\n");
+                new Logger().LogError(ModuleName, "AddBuyer", "Error Adding Buyer" + ex + "\n");
                 throw;
             }
         }
@@ -78,5 +79,31 @@ namespace XChange.Api.Repositories.Concretes
                 throw;
             }
         }
+
+        public async Task<List<Buyers>> SearchBuyers(string searchParam)
+        {
+            try
+            {
+                var _queryList = new List<Buyers>();
+                var _query = Query().ToList();
+                if (!string.IsNullOrEmpty(searchParam))
+                {
+                    if (_query != null)
+                    {
+                        _queryList = _query = _query.Where(x => x.FirstName.ToLower().Contains(searchParam)
+                                                || x.LastName.ToLower().Contains(searchParam) || x.CompanyName.ToLower().Contains(searchParam) || x.Email.ToLower().Contains(searchParam)).ToList();
+                    }
+                }
+
+                _queryList = _query.AsQueryable().ToList();
+                return _queryList.ToList();
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "SearchBuyers", "Error Searching for Buyers" + ex + "\n");
+                throw;
+            }
+        }
+
     }
 }

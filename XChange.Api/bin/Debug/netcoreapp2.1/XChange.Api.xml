@@ -12,6 +12,14 @@
             <response code="200">Details of all buyers</response>
             <response code="404">Buyers not found</response>
         </member>
+        <member name="M:XChange.Api.Controllers.AccountController.SearchAccount(System.String)">
+            <summary>
+            Search for Buyers
+            </summary>
+            <returns>List of Buyers that matches request</returns>
+            <response code="200">List of Buyers or match not found</response>
+            <response code="500">An error occurred , try again</response>
+        </member>
         <member name="M:XChange.Api.Controllers.AccountController.GetBuyer(System.Int32)">
             <summary>
             Get account of a buyer
@@ -73,6 +81,14 @@
             <returns>Details of Seller</returns>
             <response code="200">Details of all sellers</response>
             <response code="404">seller not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.SellerAccountController.SearchAccount(System.String)">
+            <summary>
+            Search for Sellers
+            </summary>
+            <returns>List of Sellers that matches request</returns>
+            <response code="200">List of Sellers or match not found</response>
+            <response code="500">An error occured, try again</response>
         </member>
         <member name="M:XChange.Api.Controllers.SellerAccountController.GetSeller(System.Int32)">
             <summary>

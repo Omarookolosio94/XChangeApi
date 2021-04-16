@@ -61,6 +61,44 @@ namespace XChange.Api.Controllers
 
         }
 
+
+        /// <summary>
+        /// Search for Sellers
+        /// </summary>
+        /// <returns>List of Sellers that matches request</returns>
+        /// <response code="200">List of Sellers or match not found</response>
+        /// <response code="500">An error occured, try again</response>
+        [HttpGet("search", Name = "SearchSellers")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Produces("application/json")]
+        public async Task<IActionResult> SearchAccount([FromQuery] string search)
+        {
+
+            var result = await _sellersService.SearchSellers(search.ToString().ToLower());
+
+            ApiResponse response;
+
+            if (result != null)
+            {
+                if (result.Count() > 0)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    response = new ApiResponse(200, "match not found");
+                    return Ok(response);
+                }
+            }
+            else
+            {
+                response = new ApiResponse(500, "An error occurred, try again");
+                return NotFound(response);
+            }
+
+        }
+
         /// <summary>
         /// Get account of a Seller
         /// </summary>
@@ -257,12 +295,13 @@ namespace XChange.Api.Controllers
             Sellers newSeller = new Sellers
             {
                 CompanyName = seller.CompanyName,
+                ContactFirstName = seller.ContactFirstName,
                 ContactLastName = seller.ContactLastName,
                 ContactPosition = seller.ContactPosition,
                 Logo = seller.Logo,
                 Phone = seller.Phone,
                 Email = user.Email,
-                MembershipId = 1,
+                MembershipId = 2,
                 UserId = userId
             };
 
@@ -336,15 +375,8 @@ namespace XChange.Api.Controllers
                 return BadRequest(response);
             }
 
-            var isRegistered = await _sellersService.IsSellerRegistered(userId);
-
-            //check if user has an account already
-            if (isRegistered)
-            {
-                response = new ApiResponse(400, "Account already exist");
-                return BadRequest(response);
-            }
-
+             
+          
             //Validate Company Name
             if (Validation.IsNull(seller.CompanyName))
             {
@@ -456,6 +488,7 @@ namespace XChange.Api.Controllers
             Sellers updateSeller = new Sellers
             {
                 CompanyName = seller.CompanyName,
+                ContactFirstName = seller.ContactFirstName,
                 ContactLastName = seller.ContactLastName,
                 ContactPosition = seller.ContactPosition,
                 Logo = seller.Logo,
@@ -481,7 +514,6 @@ namespace XChange.Api.Controllers
             }
 
         }
-
-
+ 
     }
 }

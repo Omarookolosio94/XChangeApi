@@ -12,5 +12,6 @@ namespace XChange.Api.Repositories.Interfaces
         Task<List<Sellers>> GetSellers();
         Task<Sellers> GetSeller(int userId);
         Task<bool> UpdateSeller(Sellers seller);
+        Task<List<Sellers>> SearchSellers(string searchParams);
     }
 }

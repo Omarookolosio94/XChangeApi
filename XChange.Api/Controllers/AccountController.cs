@@ -61,6 +61,46 @@ namespace XChange.Api.Controllers
 
         }
 
+
+
+        /// <summary>
+        /// Search for Buyers
+        /// </summary>
+        /// <returns>List of Buyers that matches request</returns>
+        /// <response code="200">List of Buyers or match not found</response>
+        /// <response code="500">An error occurred , try again</response>
+        [HttpGet("search", Name = "SearchBuyers")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Produces("application/json")]
+        public async Task<IActionResult> SearchAccount([FromQuery] string search)
+        {
+
+            var result = await _buyersService.SearchBuyers(search.ToString().ToLower());
+
+            ApiResponse response;
+
+            if (result != null)
+            {
+                if (result.Count() > 0)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    response = new ApiResponse(200, "match not found");
+                    return Ok(response);
+                }
+            }
+            else
+            {
+                response = new ApiResponse(500, "An error occurred, try again");
+                return NotFound(response);
+            }
+
+        }
+
+
         /// <summary>
         /// Get account of a buyer
         /// </summary>
@@ -297,7 +337,7 @@ namespace XChange.Api.Controllers
                 return BadRequest(response);
             }
 
-         
+
             //Validate First Name
             if (Validation.IsNull(buyer.FirstName))
             {
@@ -397,7 +437,6 @@ namespace XChange.Api.Controllers
             }
 
         }
-
 
     }
 }

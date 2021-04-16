@@ -94,33 +94,6 @@ namespace XChange.Api.Repositories.Concretes
         }
 
 
-            /*
-        public async Task<List<CustomerSMELimit>> GetAllCustomerUPLLimitandBySearchParam(string searchParam)
-        {
-            try
-            {
-                var _queryList = new List<CustomerSMELimit>();
-                var _query = Query().ToList();
-                if (!string.IsNullOrEmpty(searchParam))
-                {
-                    if (_query != null)
-                    {
-                        _queryList = _query = _query.Where(x => x.BVN == searchParam
-                                                || x.ACCOUNT_NO == searchParam).ToList();
-                    }
-                }
-                _queryList = _query.AsQueryable().ToList();
-                return _queryList.ToList();
-            }
-            catch (Exception ex)
-            {
-                new Logger().LogError(ModuleName, "GetAllCustomerUPLLimitandBySearchParam", "Error Getting All CustomerUPLLimit" + ex + "\n");
-                throw;
-            }
-        }
-        */
-
-
         public async Task<List<Users>> GetUsers()
         {
             try

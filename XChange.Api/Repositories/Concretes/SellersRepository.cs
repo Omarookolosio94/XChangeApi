@@ -79,5 +79,31 @@ namespace XChange.Api.Repositories.Concretes
                 throw;
             }
         }
+
+        public async Task<List<Sellers>> SearchSellers(string searchParam)
+        {
+            try
+            {
+                var _queryList = new List<Sellers>();
+                var _query = Query().ToList();
+                if (!string.IsNullOrEmpty(searchParam))
+                {
+                    if (_query != null)
+                    {
+                        _queryList = _query = _query.Where(x => x.ContactFirstName.ToLower().Contains(searchParam)
+                                                || x.ContactLastName.ToLower().Contains(searchParam) || x.ContactPosition.ToLower().Contains(searchParam) || x.CompanyName.ToLower().Contains(searchParam) || x.Email.ToLower().Contains(searchParam)).ToList();
+                    }
+                }
+
+                _queryList = _query.AsQueryable().ToList();
+                return _queryList.ToList();
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "SearchSellers", "Error Searching for Sellers" + ex + "\n");
+                throw;
+            }
+        }
+
     }
 }
