@@ -625,7 +625,7 @@ namespace XChange.Api.Controllers
                             new Claim(ClaimTypes.Name , Convert.ToString(user.UserId)),
                             new Claim(ClaimTypes.Role, user.UserType)
                 }),
-                Expires = DateTime.UtcNow.AddMonths(6),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
             };
