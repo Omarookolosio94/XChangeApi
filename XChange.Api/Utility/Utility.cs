@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 using XChange.Api.DTO;
 using XChange.Api.Models;
 using BC = BCrypt.Net.BCrypt;
@@ -11,6 +9,7 @@ namespace XChange.Api.Utility
 {
     public class Utility
     {
+  
         public static RegistrationLog AddRegistrationLog(User user, bool isSuccess, string errors = " ")
         {
 
@@ -84,5 +83,38 @@ namespace XChange.Api.Utility
             return otpLog;
 
         }
+
+        public static RefreshToken GenerateRefreshToken()
+        {
+            RefreshToken refreshToken = new RefreshToken();
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                refreshToken.Token = Convert.ToBase64String(randomNumber);
+            }
+
+            refreshToken.ExpiryDate = DateTime.UtcNow.AddMonths(6);
+
+            return refreshToken;
+        }
+
+
+        public static RefreshToken GenerateRefreshToken(int userId)
+        {
+            RefreshToken refreshToken = new RefreshToken();
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                refreshToken.Token = Convert.ToBase64String(randomNumber);
+            }
+
+            refreshToken.ExpiryDate = DateTime.UtcNow.AddMonths(6);
+            refreshToken.UserId = userId;
+
+            return refreshToken;
+        }
+
     }
 }

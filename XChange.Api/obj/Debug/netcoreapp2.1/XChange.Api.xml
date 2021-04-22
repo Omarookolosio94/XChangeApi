@@ -10,7 +10,7 @@
             </summary>
             <returns>Details of buyer</returns>
             <response code="200">Details of all buyers</response>
-            <response code="404">Buyers not found</response>
+            <response code="500">An error occured, please try again</response>
         </member>
         <member name="M:XChange.Api.Controllers.AccountController.SearchAccount(System.String)">
             <summary>
@@ -72,6 +72,93 @@
              <returns>Update Buyer's account</returns>
              <response code="200">Account update successful</response>
              <response code="400">Pass in required information , create a seller account</response>
+             <response code="404">User's profile not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AddressController.Address">
+            <summary>
+            Get address of all users
+            </summary>
+            <returns>List of users address</returns>
+            <response code="200">Address of users</response>
+            <response code="500">An error occured, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AddressController.SearchAddress(System.String)">
+            <summary>
+            Search for a given address
+            </summary>
+            <returns>List of address that matches request</returns>
+            <response code="200">List of address or match not found</response>
+            <response code="500">An error occurred , try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AddressController.GetSingleAddress(System.Int32)">
+            <summary>
+            Get single address
+            </summary>
+            <returns>A single address</returns>
+            <response code="200">Single address</response>
+            <response code="404">User not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AddressController.GetAddressOfUser(System.Int32)">
+            <summary>
+            Get all address of a user
+            </summary>
+            <returns>List of a user address</returns>
+            <response code="200">Address of a user</response>
+            <response code="500">An error occured, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AddressController.GetSingleAddressOfUser(System.Int32,System.Int32)">
+            <summary>
+            Get single address of a user
+            </summary>
+            <returns>A single address</returns>
+            <response code="200">Single address of a user</response>
+            <response code="404">Address not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AddressController.Address(System.Int32,XChange.Api.DTO.AddressDTO)">
+             <summary>
+             Add address for user
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST api/address/{userId}
+                 
+                 {
+                    "AddressType" : " ",
+                    "Street": "48 Vaughan Steet",
+                    "City": "Ebute Metta",
+                    "State": "Lagos",
+                    "Country": "Nigeria",
+                    "PostalCode": ""
+                 }
+            
+             </remarks>
+             <returns>Address created success message</returns>
+             <response code="200">Success message</response>
+             <response code="400">Pass in required information</response>
+             <response code="404">User's profile not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AddressController.Address(System.Int32,System.Int32,XChange.Api.DTO.AddressDTO)">
+             <summary>
+             Update address for user
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 PUT api/address/{userId}/{addressId}
+                 {
+                    "AddressType" : " ",
+                    "Street": "48 Vaughan Steet",
+                    "City": "Ebute Metta",
+                    "State": "Lagos",
+                    "Country": "Nigeria",
+                    "PostalCode": ""
+                 }
+            
+             </remarks>
+             <returns>Address update success message</returns>
+             <response code="200">Success message</response>
+             <response code="400">Pass in required information</response>
              <response code="404">User's profile not found</response>
         </member>
         <member name="M:XChange.Api.Controllers.SellerAccountController.SellerAccount">
@@ -236,6 +323,25 @@
              <returns>Success message</returns>
              <response code="200">Your password has been updated</response>
              <response code="400">An error occurred, request for new password reset Otp</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.UsersController.RefreshToken(XChange.Api.DTO.RefreshTokenRequest)">
+             <summary>
+             Refresh Token
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST api/users/token
+                 
+                 {
+                    "Token": " ",
+                    "RefreshToken": " ",
+                 }
+            
+             </remarks>
+             <returns>Success message</returns>
+             <response code="200">Returns token response</response>
+             <response code="400">An error occurred, please try again</response>
         </member>
     </members>
 </doc>

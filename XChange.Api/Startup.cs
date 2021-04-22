@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using XChange.Api.DTO;
 using XChange.Api.Extensions;
 using XChange.Api.Services.Concretes;
@@ -29,7 +32,10 @@ namespace XChange.Api
         {
 
             var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+            var jwtSection = Configuration.GetSection("JWTSettings");
+
             services.AddSingleton(emailConfig);
+            services.Configure<JWTSettings>(jwtSection);
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IRegistrationLogService, RegistrationLogService>();
@@ -37,6 +43,30 @@ namespace XChange.Api
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+
+            //Adding Authenticating
+            var JWTSettings = jwtSection.Get<JWTSettings>();
+            var key = Encoding.ASCII.GetBytes(JWTSettings.SecretKey);
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = true;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
            
             services.AddSwaggerGen(c =>
             {
@@ -81,6 +111,8 @@ namespace XChange.Api
                 app.UseHsts();
             }
 
+
+            app.UseAuthentication();
             //Error Handler Exception
             app.ConfigureExceptionHandler(env);
 

@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.1",
-    "signature": "78f7f20e6f0899f945350558ae5c3eea82f88c70"
+    "signature": "12ba54ad3d2916c27cfc4fc3019b4e7586dcb2e1"
   },
   "compilationOptions": {
     "defines": [
@@ -27,6 +27,7 @@
           "BCrypt.Net-Next": "4.0.2",
           "MailKit": "2.11.1",
           "Microsoft.AspNetCore.App": "2.1.1",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "2.1.2",
           "Microsoft.AspNetCore.Razor.Design": "2.1.2",
           "Microsoft.EntityFrameworkCore.SqlServer": "2.1.1",
           "Microsoft.EntityFrameworkCore.Tools": "2.1.14",
@@ -81,6 +82,41 @@
         },
         "compile": {
           "lib/netstandard2.0/MailKit.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Authentication/2.1.2": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Authentication.Core": "2.1.1",
+          "Microsoft.AspNetCore.DataProtection": "2.1.1",
+          "Microsoft.AspNetCore.Http": "2.1.1",
+          "Microsoft.AspNetCore.Http.Extensions": "2.1.1",
+          "Microsoft.Extensions.Logging.Abstractions": "2.1.1",
+          "Microsoft.Extensions.Options": "2.1.1",
+          "Microsoft.Extensions.WebEncoders": "2.1.1"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.dll": {
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.18207"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.JwtBearer/2.1.2": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Authentication": "2.1.2",
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "5.2.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
+            "assemblyVersion": "2.1.2.0",
+            "fileVersion": "2.1.2.18207"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {}
         }
       },
       "Microsoft.AspNetCore.Razor.Design/2.1.2": {},
@@ -960,13 +996,13 @@
           "Microsoft.AspNet.WebApi.Client": "5.2.6",
           "Microsoft.AspNetCore": "2.1.1",
           "Microsoft.AspNetCore.Antiforgery": "2.1.1",
-          "Microsoft.AspNetCore.Authentication": "2.1.1",
+          "Microsoft.AspNetCore.Authentication": "2.1.2",
           "Microsoft.AspNetCore.Authentication.Abstractions": "2.1.1",
           "Microsoft.AspNetCore.Authentication.Cookies": "2.1.1",
           "Microsoft.AspNetCore.Authentication.Core": "2.1.1",
           "Microsoft.AspNetCore.Authentication.Facebook": "2.1.1",
           "Microsoft.AspNetCore.Authentication.Google": "2.1.1",
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "2.1.1",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "2.1.2",
           "Microsoft.AspNetCore.Authentication.MicrosoftAccount": "2.1.1",
           "Microsoft.AspNetCore.Authentication.OAuth": "2.1.1",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "2.1.1",
@@ -1104,21 +1140,6 @@
         },
         "compileOnly": true
       },
-      "Microsoft.AspNetCore.Authentication/2.1.1": {
-        "dependencies": {
-          "Microsoft.AspNetCore.Authentication.Core": "2.1.1",
-          "Microsoft.AspNetCore.DataProtection": "2.1.1",
-          "Microsoft.AspNetCore.Http": "2.1.1",
-          "Microsoft.AspNetCore.Http.Extensions": "2.1.1",
-          "Microsoft.Extensions.Logging.Abstractions": "2.1.1",
-          "Microsoft.Extensions.Options": "2.1.1",
-          "Microsoft.Extensions.WebEncoders": "2.1.1"
-        },
-        "compile": {
-          "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.dll": {}
-        },
-        "compileOnly": true
-      },
       "Microsoft.AspNetCore.Authentication.Abstractions/2.1.1": {
         "dependencies": {
           "Microsoft.AspNetCore.Http.Abstractions": "2.1.1",
@@ -1132,7 +1153,7 @@
       },
       "Microsoft.AspNetCore.Authentication.Cookies/2.1.1": {
         "dependencies": {
-          "Microsoft.AspNetCore.Authentication": "2.1.1"
+          "Microsoft.AspNetCore.Authentication": "2.1.2"
         },
         "compile": {
           "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.Cookies.dll": {}
@@ -1168,16 +1189,6 @@
         },
         "compileOnly": true
       },
-      "Microsoft.AspNetCore.Authentication.JwtBearer/2.1.1": {
-        "dependencies": {
-          "Microsoft.AspNetCore.Authentication": "2.1.1",
-          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "5.2.0"
-        },
-        "compile": {
-          "lib/netstandard2.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {}
-        },
-        "compileOnly": true
-      },
       "Microsoft.AspNetCore.Authentication.MicrosoftAccount/2.1.1": {
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.OAuth": "2.1.1"
@@ -1189,7 +1200,7 @@
       },
       "Microsoft.AspNetCore.Authentication.OAuth/2.1.1": {
         "dependencies": {
-          "Microsoft.AspNetCore.Authentication": "2.1.1",
+          "Microsoft.AspNetCore.Authentication": "2.1.2",
           "Newtonsoft.Json": "11.0.2"
         },
         "compile": {
@@ -1218,7 +1229,7 @@
       },
       "Microsoft.AspNetCore.Authentication.WsFederation/2.1.1": {
         "dependencies": {
-          "Microsoft.AspNetCore.Authentication": "2.1.1",
+          "Microsoft.AspNetCore.Authentication": "2.1.2",
           "Microsoft.IdentityModel.Protocols.WsFederation": "5.2.0",
           "System.IdentityModel.Tokens.Jwt": "5.2.0"
         },
@@ -3744,6 +3755,20 @@
       "path": "mailkit/2.11.1",
       "hashPath": "mailkit.2.11.1.nupkg.sha512"
     },
+    "Microsoft.AspNetCore.Authentication/2.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-RYM3HHMm/MNwsbUh1xnrhosAGNeZV2Q/FmNQrblgytIK1HIZ6UqNMorFI+kz2MW7gNKHKn6TBLTUXPRmqC6iRQ==",
+      "path": "microsoft.aspnetcore.authentication/2.1.2",
+      "hashPath": "microsoft.aspnetcore.authentication.2.1.2.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Authentication.JwtBearer/2.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hedJ6YxyZRIJPXC2olml9YM5t3+yIFt9hcyBXp/q5+z4XpJMY5gUwbc1F5QRGEdcvwSCpFmmRLVaPPh4Kiaq0g==",
+      "path": "microsoft.aspnetcore.authentication.jwtbearer/2.1.2",
+      "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.2.1.2.nupkg.sha512"
+    },
     "Microsoft.AspNetCore.Razor.Design/2.1.2": {
       "type": "package",
       "serviceable": true,
@@ -4169,13 +4194,6 @@
       "path": "microsoft.aspnetcore.app/2.1.1",
       "hashPath": "microsoft.aspnetcore.app.2.1.1.nupkg.sha512"
     },
-    "Microsoft.AspNetCore.Authentication/2.1.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-F9Ewm6Oo5hn1CR7HglsZnKM5pMJekdZoGJoi8fnKEFOoQruxJUQVpHB8dfpB+0ZJmyeapGn+grdrXsoBWilIFg==",
-      "path": "microsoft.aspnetcore.authentication/2.1.1",
-      "hashPath": "microsoft.aspnetcore.authentication.2.1.1.nupkg.sha512"
-    },
     "Microsoft.AspNetCore.Authentication.Abstractions/2.1.1": {
       "type": "package",
       "serviceable": true,
@@ -4210,13 +4228,6 @@
       "sha512": "sha512-yLFEgOl1Uwgnr6yPqJDqiM/jSlyJyo1ZDDktYfDN1kzP5ga4/5vFpTrNkO1Q7MEttdwVc9bICX3icmXBuTjsXg==",
       "path": "microsoft.aspnetcore.authentication.google/2.1.1",
       "hashPath": "microsoft.aspnetcore.authentication.google.2.1.1.nupkg.sha512"
-    },
-    "Microsoft.AspNetCore.Authentication.JwtBearer/2.1.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-lMakzPdMkf4rpwy+YY3cd4VeFqdqM8vwt9pT6Lc1eyKMgOTPgAgesgOwHQf4JUASFBTkG/mTPC+miQwG1WGymg==",
-      "path": "microsoft.aspnetcore.authentication.jwtbearer/2.1.1",
-      "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.2.1.1.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Authentication.MicrosoftAccount/2.1.1": {
       "type": "package",

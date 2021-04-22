@@ -87,7 +87,7 @@ namespace XChange.Api.Repositories.Concretes
             }
             catch (Exception ex)
             {
-                new Logger().LogError(ModuleName, "GetSingleAddressOfUser", "Error Fetching single adress of user: " + userId + " address: " + addressId + " error : " + ex + "\n");
+                new Logger().LogError(ModuleName, "GetSingleAddressOfUser", "Error Fetching single adress of user: " + userId + "address: " + addressId + "error : " + ex + "\n");
                 throw;
             }
         }

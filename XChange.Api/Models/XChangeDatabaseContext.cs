@@ -28,6 +28,7 @@ namespace XChange.Api.Models
         public virtual DbSet<OtpLog> OtpLog { get; set; }
         public virtual DbSet<Payments> Payments { get; set; }
         public virtual DbSet<Products> Products { get; set; }
+        public virtual DbSet<RefreshToken> RefreshToken { get; set; }
         public virtual DbSet<RegistrationLog> RegistrationLog { get; set; }
         public virtual DbSet<Reviews> Reviews { get; set; }
         public virtual DbSet<Sellers> Sellers { get; set; }
@@ -326,6 +327,22 @@ namespace XChange.Api.Models
                 entity.Property(e => e.SellerId).HasColumnName("SellerID");
 
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 0)");
+            });
+
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasKey(e => e.TokenId);
+
+                entity.Property(e => e.TokenId).HasColumnName("TokenID");
+
+                entity.Property(e => e.ExpiryDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Token)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
             });
 
             modelBuilder.Entity<RegistrationLog>(entity =>

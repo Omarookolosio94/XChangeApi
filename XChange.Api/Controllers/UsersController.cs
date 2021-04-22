@@ -13,6 +13,11 @@ using BC = BCrypt.Net.BCrypt;
 using static XChange.Api.DTO.ModelError;
 using XChange.Api.Services.Concretes;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace XChange.Api.Controllers
 {
@@ -28,19 +33,23 @@ namespace XChange.Api.Controllers
         private readonly IAuditLogService _auditLogService;
         public readonly IEmailService _emailService;
         private readonly IOtpLogService _otpLogService;
+        private readonly IRefreshTokenService _refreshTokenService;
+        private readonly JWTSettings _jwtSettings;
 
 
-        public UsersController(IEmailService emailService)
+        public UsersController(IEmailService emailService, IOptions<JWTSettings> jwtSettings)
         {
             _usersService = new UsersService(new UsersRepository(dbContext));
             _registrationLogService = new RegistrationLogService(new RegistrationLogRepository(dbContext));
             _otpLogService = new OtpLogService(new OtpLogRepository(dbContext));
             _auditLogService = new AuditLogService(new AuditLogRepository(dbContext));
+            _refreshTokenService = new RefreshTokenService(new RefreshTokenRepository(dbContext));
             _emailService = emailService;
+            _jwtSettings = jwtSettings.Value;
 
         }
 
-      
+
         /// <summary>
         /// Get details of all registered users
         /// </summary>
@@ -74,7 +83,7 @@ namespace XChange.Api.Controllers
 
         }
 
-        
+
         /// <summary>
         /// Creates a new user
         /// </summary>
@@ -230,7 +239,7 @@ namespace XChange.Api.Controllers
             }
         }
 
-      
+
         /// <summary>
         /// Get single user 
         /// </summary>
@@ -261,7 +270,7 @@ namespace XChange.Api.Controllers
             }
 
         }
- 
+
         /// <summary>
         /// Verify Otp issued to user
         /// </summary>
@@ -302,9 +311,24 @@ namespace XChange.Api.Controllers
                         await _usersService.VerifyUser(user.UserId, true);
                     }
 
-                    //send jwt token back to user      
-                    response = new ApiResponse(200, "Your account has been verified successfully");
-                    return Ok(response);
+                    //Generate refresh Token
+                    RefreshToken refreshToken = Utility.Utility.GenerateRefreshToken(user.UserId);
+                    await _refreshTokenService.AddRefreshToken(refreshToken);
+
+                    //Generate Access Token
+                    var token = GenerateAccessToken(user);
+
+                    TokenResponse tokenResponse = new TokenResponse
+                    {
+                        Token = token,
+                        RefreshToken = refreshToken.Token,
+                        Email = user.Email,
+                        UserId = user.UserId,
+                        UserType = user.UserType
+                    };
+
+                    //response = new ApiResponse(200, "Your account has been verified successfully");
+                    return Ok(tokenResponse);
 
                 }
                 else
@@ -323,7 +347,7 @@ namespace XChange.Api.Controllers
         }
 
 
-       
+
         /// <summary>
         /// Generate Otp for user
         /// </summary>
@@ -365,7 +389,7 @@ namespace XChange.Api.Controllers
 
             //generate otp
             OtpLog userOtp = Utility.Utility.NewOtpLog(userEmail);
-            
+
             //save otp to database
             bool otpResult = await _otpLogService.AddOtp(userOtp);
 
@@ -382,7 +406,7 @@ namespace XChange.Api.Controllers
         }
 
 
-      
+
         /// <summary>
         /// Reset Password ,sends reset Otp to user
         /// </summary>
@@ -440,7 +464,7 @@ namespace XChange.Api.Controllers
         }
 
 
- 
+
         /// <summary>
         /// Reset password
         /// </summary>
@@ -476,7 +500,7 @@ namespace XChange.Api.Controllers
             if (isOtpValid)
             {
                 var result = await _usersService.ResetPassword(email, password);
-                
+
                 if (result)
                 {
 
@@ -501,6 +525,113 @@ namespace XChange.Api.Controllers
                 return BadRequest(response);
             }
 
+        }
+
+        /// <summary>
+        /// Refresh Token
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST api/users/token
+        ///     
+        ///     {
+        ///        "Token": " ",
+        ///        "RefreshToken": " ",
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>Success message</returns>
+        /// <response code="200">Returns token response</response>
+        /// <response code="400">An error occurred, please try again</response>
+        [HttpPost("token", Name = "RefreshToken")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
+        {
+            ApiResponse response;
+            //Get user from access token
+            Users user = await GetUserFromAccessToken(refreshTokenRequest.Token);
+
+            bool isRefreshTokenValid = await _refreshTokenService.IsRefreshTokenValid(user.UserId, refreshTokenRequest.RefreshToken);
+
+            if (user != null && isRefreshTokenValid)
+            {
+                //Generate Access Token
+                var token = GenerateAccessToken(user);
+
+                TokenResponse tokenResponse = new TokenResponse
+                {
+                    Token = token,
+                    RefreshToken = refreshTokenRequest.RefreshToken,
+                    Email = user.Email,
+                    UserId = user.UserId,
+                    UserType = user.UserType
+                };
+
+                return Ok(tokenResponse);
+            }
+
+            response = new ApiResponse(400, "An error occurred, Please Try Again");
+            return NotFound(response);
+        }
+
+
+        private async Task<Users> GetUserFromAccessToken(string accessToken)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+
+                var tokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+
+                SecurityToken securityToken;
+                var principle = tokenHandler.ValidateToken(accessToken, tokenValidationParameters, out securityToken);
+
+                JwtSecurityToken jwtSecurityToken = securityToken as JwtSecurityToken;
+
+                if (jwtSecurityToken != null && jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var userId = principle.FindFirst(ClaimTypes.Name)?.Value;
+                    return await _usersService.GetUser(Convert.ToInt32(userId));
+                }
+            }
+            catch (Exception)
+            {
+                return new Users();
+            }
+
+            return new Users();
+        }
+
+
+        private string GenerateAccessToken(Users user)
+        { 
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                            new Claim(ClaimTypes.Name , Convert.ToString(user.UserId)),
+                            new Claim(ClaimTypes.Role, user.UserType)
+                }),
+                Expires = DateTime.UtcNow.AddMonths(6),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 }

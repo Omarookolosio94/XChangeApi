@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Validation;
@@ -15,6 +16,7 @@ using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
 {
+    [Authorize]
     [Route("api/account")]
     [ApiController]
     [Produces("application/json")]
@@ -39,10 +41,10 @@ namespace XChange.Api.Controllers
         /// </summary>
         /// <returns>Details of buyer</returns>
         /// <response code="200">Details of all buyers</response>
-        /// <response code="404">Buyers not found</response>
+        /// <response code="500">An error occured, please try again</response>
         [HttpGet(Name = "GetAccounts")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces("application/json")]
         public async Task<IActionResult> Account()
         {

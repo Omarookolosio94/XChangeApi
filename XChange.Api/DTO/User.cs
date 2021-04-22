@@ -19,4 +19,5 @@ namespace XChange.Api.DTO
         public string UserLastName { get; set; }
         public string Gender { get; set; }
     }
+
 }
