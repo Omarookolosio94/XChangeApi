@@ -22,9 +22,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace XChange.Api.Controllers
 {
+    [AllowAnonymous]
     [Route("api/users")]
     [ApiController]
-    [AllowAnonymous]
     [Produces("application/json")]
     public class UsersController : ControllerBase
     {

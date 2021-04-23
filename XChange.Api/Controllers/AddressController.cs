@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
 {
+    [AllowAnonymous]
     [Route("api/address")]
     [ApiController]
     [Produces("application/json")]
