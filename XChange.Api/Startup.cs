@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -41,9 +42,11 @@ namespace XChange.Api
             services.AddScoped<IRegistrationLogService, RegistrationLogService>();
             services.AddScoped<IOtpLogService, OtpLogService>();
 
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
+            services.AddMvc(options =>
+                    {
+                        // All endpoints need authorization using our custom authorization filter
+                        options.Filters.Add(new CustomAuthorizationFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             //Adding Authenticating
             var JWTSettings = jwtSection.Get<JWTSettings>();
@@ -67,7 +70,7 @@ namespace XChange.Api
                     ValidateAudience = false
                 };
             });
-           
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo

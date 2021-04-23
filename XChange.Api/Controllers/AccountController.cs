@@ -16,7 +16,7 @@ using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "B")]
     [Route("api/account")]
     [ApiController]
     [Produces("application/json")]

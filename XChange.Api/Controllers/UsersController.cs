@@ -18,11 +18,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace XChange.Api.Controllers
 {
     [Route("api/users")]
     [ApiController]
+    [AllowAnonymous]
     [Produces("application/json")]
     public class UsersController : ControllerBase
     {
