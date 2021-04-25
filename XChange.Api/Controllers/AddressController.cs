@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities.Validation;
 using XChange.Api.DTO;
@@ -198,7 +199,7 @@ namespace XChange.Api.Controllers
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST api/address/{userId}
+        ///     POST api/address
         ///     
         ///     {
         ///        "AddressType" : " ",
@@ -213,14 +214,12 @@ namespace XChange.Api.Controllers
         /// <returns>Address created success message</returns>
         /// <response code="200">Success message</response>
         /// <response code="400">Pass in required information</response>
-        /// <response code="404">User's profile not found</response>
-        [HttpPost("{userId}")]
+        [HttpPost(Name ="AddAddress")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Address(int userId, [FromBody] AddressDTO address)
+        [Authorize]
+        public async Task<IActionResult> Address([FromBody] AddressDTO address)
         {
             ModelError errors;
             List<Error> errorList = new List<Error> { };
@@ -228,14 +227,7 @@ namespace XChange.Api.Controllers
             bool dataValid = true;
 
             //get user details
-            Users user = await _usersService.GetUser(userId);
-
-            if (user == null)
-            {
-                response = new ApiResponse(404, "User profile not found");
-                return NotFound(response);
-            }
-
+            var userId = User.Claims.Where(a => a.Type == ClaimTypes.Name).FirstOrDefault().Value;
 
             //Validate Street
             if (Validation.IsNull(address.Street))
@@ -248,20 +240,6 @@ namespace XChange.Api.Controllers
 
                 errorList.Add(err);
                 dataValid = false;
-            }
-
-            //Validate Street Length
-            if (!Validation.IsNull(address.Street) && address.Street.Length > 40)
-            {
-                Error err = new Error
-                {
-                    modelName = "Street",
-                    modelErrorMessgae = "Street should be less than or equal to 40",
-                };
-
-                errorList.Add(err);
-                dataValid = false;
-
             }
 
             //Validate City
@@ -279,12 +257,12 @@ namespace XChange.Api.Controllers
             }
 
             //Validate City Length
-            if (!Validation.IsNull(address.City) && address.City.Length > 40)
+            if (!Validation.IsNull(address.City) && address.City.Length > 100)
             {
                 Error err = new Error
                 {
                     modelName = "City",
-                    modelErrorMessgae = "City should be less than or equal to 40",
+                    modelErrorMessgae = "City should be less than or equal to 100",
                 };
 
                 errorList.Add(err);
@@ -307,18 +285,46 @@ namespace XChange.Api.Controllers
             }
 
             //Validate State Length
-            if (!Validation.IsNull(address.State) && address.State.Length > 40)
+            if (!Validation.IsNull(address.State) && address.State.Length > 100)
             {
                 Error err = new Error
                 {
                     modelName = "State",
-                    modelErrorMessgae = "State should be less than or equal to 40",
+                    modelErrorMessgae = "State should be less than or equal to 100",
                 };
 
                 errorList.Add(err);
                 dataValid = false;
 
             }
+
+            //Validate Country Length
+            if (address.Country.Length > 100)
+            {
+                Error err = new Error
+                {
+                    modelName = "Country",
+                    modelErrorMessgae = "Country should be less than or equal to 100",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+
+            }
+
+            //Validate PostalCode Length
+            if (address.PostalCode.Length > 7)
+            {
+                Error err = new Error
+                {
+                    modelName = "PostalCode",
+                    modelErrorMessgae = "Postal Code should be less than or equal to 7",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+            }
+
 
             //Pass Error Response
             if (!dataValid)
@@ -337,7 +343,7 @@ namespace XChange.Api.Controllers
                 State = address.State,
                 Country = address.Country,
                 PostalCode = address.PostalCode,
-                UserId = userId
+                UserId = Convert.ToInt32(userId)
             };
 
 
@@ -346,7 +352,7 @@ namespace XChange.Api.Controllers
             if (result)
             {
                 //add audit log
-                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, user.Email, "Added address: " + newAddress.Street );
+                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), "Added address: " + newAddress.Street );
                 _auditLogService.AddAuditLog(auditLog);
 
                 response = new ApiResponse(200, "Address added successfully");
@@ -367,7 +373,7 @@ namespace XChange.Api.Controllers
         /// <remarks>
         /// Sample request:
         ///
-        ///     PUT api/address/{userId}/{addressId}
+        ///     PUT api/address/{addressId}
         ///     {
         ///        "AddressType" : " ",
         ///        "Street": "48 Vaughan Steet",
@@ -380,15 +386,13 @@ namespace XChange.Api.Controllers
         /// </remarks>
         /// <returns>Address update success message</returns>
         /// <response code="200">Success message</response>
-        /// <response code="400">Pass in required information</response>
-        /// <response code="404">User's profile not found</response>
-        [HttpPut("{userId}/{addressId}")]
+        /// <response code="400">Pass in required information or product does not exist or you are not eligible to carry out this action</response>
+        [HttpPut("{addressId}" , Name ="UpdateAddress")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Address(int userId,int addressId, [FromBody] AddressDTO address)
+        [Authorize]
+        public async Task<IActionResult> Address(int addressId, [FromBody] AddressDTO address)
         {
             ModelError errors;
             List<Error> errorList = new List<Error> { };
@@ -396,14 +400,8 @@ namespace XChange.Api.Controllers
             bool dataValid = true;
 
             //get user details
-            Users user = await _usersService.GetUser(userId);
+            var userId = User.Claims.Where(a => a.Type == ClaimTypes.Name).FirstOrDefault().Value;
 
-            if (user == null)
-            {
-                response = new ApiResponse(404, "User profile not found");
-                return NotFound(response);
-            }
- 
             //Validate Street
             if (Validation.IsNull(address.Street))
             {
@@ -417,19 +415,6 @@ namespace XChange.Api.Controllers
                 dataValid = false;
             }
 
-            //Validate Street Length
-            if (!Validation.IsNull(address.Street) && address.Street.Length > 40)
-            {
-                Error err = new Error
-                {
-                    modelName = "Street",
-                    modelErrorMessgae = "Street should be less than or equal to 40",
-                };
-
-                errorList.Add(err);
-                dataValid = false;
-
-            }
 
             //Validate City
             if (Validation.IsNull(address.City))
@@ -446,12 +431,12 @@ namespace XChange.Api.Controllers
             }
 
             //Validate City Length
-            if (!Validation.IsNull(address.City) && address.City.Length > 40)
+            if (!Validation.IsNull(address.City) && address.City.Length > 100)
             {
                 Error err = new Error
                 {
                     modelName = "City",
-                    modelErrorMessgae = "City should be less than or equal to 40",
+                    modelErrorMessgae = "City should be less than or equal to 100",
                 };
 
                 errorList.Add(err);
@@ -474,18 +459,46 @@ namespace XChange.Api.Controllers
             }
 
             //Validate State Length
-            if (!Validation.IsNull(address.State) && address.State.Length > 40)
+            if (!Validation.IsNull(address.State) && address.State.Length > 100)
             {
                 Error err = new Error
                 {
                     modelName = "State",
-                    modelErrorMessgae = "State should be less than or equal to 40",
+                    modelErrorMessgae = "State should be less than or equal to 100",
                 };
 
                 errorList.Add(err);
                 dataValid = false;
 
             }
+
+            //Validate Country Length
+            if (address.Country.Length > 100)
+            {
+                Error err = new Error
+                {
+                    modelName = "Country",
+                    modelErrorMessgae = "Country should be less than or equal to 100",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+
+            }
+
+            //Validate PostalCode Length
+            if (address.PostalCode.Length > 7)
+            {
+                Error err = new Error
+                {
+                    modelName = "PostalCode",
+                    modelErrorMessgae = "Postal Code should be less than or equal to 7",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+            }
+
 
             //Pass Error Response
             if (!dataValid)
@@ -508,12 +521,12 @@ namespace XChange.Api.Controllers
             };
 
 
-            var result = await _addressService.UpdateAddress(userId, updateAddress);
+            var result = await _addressService.UpdateAddress(Convert.ToInt32(userId), updateAddress);
 
             if (result)
             {
                 //add audit log
-                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, user.Email, "Updated address: " + updateAddress.Street);
+                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId) , "Updated address: " + updateAddress.Street);
                 _auditLogService.AddAuditLog(auditLog);
 
                 response = new ApiResponse(200, "Address updated successfully");
@@ -521,7 +534,43 @@ namespace XChange.Api.Controllers
             }
             else
             {
-                response = new ApiResponse(400, "An error occurred , please try again");
+                response = new ApiResponse(400, "Address does not exist or you are not eligible to carry out this action");
+                return BadRequest(response);
+            }
+
+        }
+
+        /// <summary>
+        /// Deletes a user address
+        /// </summary>
+        /// <returns>Delete success message</returns>
+        /// <response code="200">Address has been deleted successfully</response>
+        /// <response code="400">Address does not exist or you are not eligible to carry out this action</response>
+        [HttpDelete("{addressId}", Name = "DeleteAddress")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
+        [Authorize]
+        public async Task<IActionResult> Address(int addressId)
+        {
+            ApiResponse response;
+
+            var userId = User.Claims.Where(a => a.Type == ClaimTypes.Name).FirstOrDefault().Value;
+
+            var result = await _addressService.DeleteAddress(Convert.ToInt32(userId), addressId);
+
+            if (result)
+            {
+                //add audit log
+                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), "Deleted address: " + addressId);
+                _auditLogService.AddAuditLog(auditLog);
+
+                response = new ApiResponse(200, "Address has been deleted successfully");
+                return Ok(response);
+            }
+            else
+            {
+                response = new ApiResponse(400, "Address does not exist or you are not eligible to carry out this action");
                 return BadRequest(response);
             }
 

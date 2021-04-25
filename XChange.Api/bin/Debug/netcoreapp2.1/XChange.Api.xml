@@ -114,14 +114,14 @@
             <response code="200">Single address of a user</response>
             <response code="404">Address not found</response>
         </member>
-        <member name="M:XChange.Api.Controllers.AddressController.Address(System.Int32,XChange.Api.DTO.AddressDTO)">
+        <member name="M:XChange.Api.Controllers.AddressController.Address(XChange.Api.DTO.AddressDTO)">
              <summary>
              Add address for user
              </summary>
              <remarks>
              Sample request:
             
-                 POST api/address/{userId}
+                 POST api/address
                  
                  {
                     "AddressType" : " ",
@@ -136,16 +136,15 @@
              <returns>Address created success message</returns>
              <response code="200">Success message</response>
              <response code="400">Pass in required information</response>
-             <response code="404">User's profile not found</response>
         </member>
-        <member name="M:XChange.Api.Controllers.AddressController.Address(System.Int32,System.Int32,XChange.Api.DTO.AddressDTO)">
+        <member name="M:XChange.Api.Controllers.AddressController.Address(System.Int32,XChange.Api.DTO.AddressDTO)">
              <summary>
              Update address for user
              </summary>
              <remarks>
              Sample request:
             
-                 PUT api/address/{userId}/{addressId}
+                 PUT api/address/{addressId}
                  {
                     "AddressType" : " ",
                     "Street": "48 Vaughan Steet",
@@ -158,8 +157,15 @@
              </remarks>
              <returns>Address update success message</returns>
              <response code="200">Success message</response>
-             <response code="400">Pass in required information</response>
-             <response code="404">User's profile not found</response>
+             <response code="400">Pass in required information or product does not exist or you are not eligible to carry out this action</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.AddressController.Address(System.Int32)">
+            <summary>
+            Deletes a user address
+            </summary>
+            <returns>Delete success message</returns>
+            <response code="200">Address has been deleted successfully</response>
+            <response code="400">Address does not exist or you are not eligible to carry out this action</response>
         </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products">
             <summary>
@@ -217,6 +223,39 @@
              <response code="201">Newly created product</response>
              <response code="400">Pass in required information</response>
              <response code="404">seller not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ProductsController.Products(System.Int32,XChange.Api.DTO.Product)">
+             <summary>
+             Updates a product
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 PUT api/products
+                 
+                 {
+                    "Category":"",
+                    "ProductName": "",
+                    "Quantity": 1,
+                    "UnitPrice": 200,
+                    "ProductDescription": "",
+                    "UnitsInStock": 10,
+                    "UnitsInOrder": 0,
+                 }
+            
+             </remarks>
+             <returns>Updated product</returns>
+             <response code="201">Recently Updated product</response>
+             <response code="400">Pass in required information</response>
+             <response code="404">seller not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ProductsController.Products(System.Int32)">
+            <summary>
+            Deletes a product
+            </summary>
+            <returns>Delete success message</returns>
+            <response code="200">Product has been deleted successfully</response>
+            <response code="400">Product does not exist or you are not eligible to carry out this action</response>
         </member>
         <member name="M:XChange.Api.Controllers.SellerAccountController.SellerAccount">
             <summary>

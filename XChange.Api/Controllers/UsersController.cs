@@ -231,7 +231,6 @@ namespace XChange.Api.Controllers
 
                 _emailService.SendEmail(message);
 
-
                 ApiResponse response = new ApiResponse(200, "Registration Successful", "Verfification Email has been sent to " + user.Email);
                 return Ok(response);
             }

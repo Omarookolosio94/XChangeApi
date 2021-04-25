@@ -15,5 +15,6 @@ namespace XChange.Api.Services.Interfaces
         Task<Address> GetSingleAddressOfUser(int userId, int addressId);
         Task<bool> UpdateAddress(int userId , Address address);
         Task<List<Address>> SearchAddress(string searchParam);
+        Task<bool> DeleteAddress(int userId, int addressId);
     }
 }

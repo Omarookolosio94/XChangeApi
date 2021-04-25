@@ -128,5 +128,19 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
+
+        public async Task<bool> DeleteAddress(int userId, int addressId)
+        {
+            try
+            {
+                var status = await _addressRepository.DeleteAddress(userId, addressId);
+                return status;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
     }
 }

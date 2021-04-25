@@ -375,7 +375,7 @@ namespace XChange.Api.Controllers
 
             if (seller == null)
             {
-                response = new ApiResponse(404, "Seller not found");
+                response = new ApiResponse(404, "You are not eligible to carry out this action");
                 return NotFound(response);
             }
 
@@ -480,6 +480,49 @@ namespace XChange.Api.Controllers
             else
             {
                 response = new ApiResponse(400, "Product update failed , you may not be eligible for performing this action.");
+                return BadRequest(response);
+            }
+
+        }
+
+        /// <summary>
+        /// Deletes a product
+        /// </summary>
+        /// <returns>Delete success message</returns>
+        /// <response code="200">Product has been deleted successfully</response>
+        /// <response code="400">Product does not exist or you are not eligible to carry out this action</response>
+        [HttpDelete("{productId}" , Name ="DeleteProduct")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
+        [Authorize(Roles = "S")]
+        public async Task<IActionResult> Products(int productId)
+        {
+            ApiResponse response;
+
+            var userId = User.Claims.Where(a => a.Type == ClaimTypes.Name).FirstOrDefault().Value;
+            var seller = await _sellersService.GetSeller(Convert.ToInt32(userId));
+
+            if (seller == null)
+            {
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
+                return NotFound(response);
+            }
+
+            var result = await _productsService.DeleteProduct(seller.SellerId, productId);
+
+            if (result)
+            {
+                //add audit log
+                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), seller.Email, "Deleted product: " + productId);
+                _auditLogService.AddAuditLog(auditLog);
+
+                response = new ApiResponse(200, "Product has been deleted successfully");
+                return Ok(response);
+            }
+            else
+            {
+                response = new ApiResponse(400, "Product does not exist or you are not eligible to carry out this action");
                 return BadRequest(response);
             }
 

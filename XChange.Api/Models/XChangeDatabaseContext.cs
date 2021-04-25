@@ -53,17 +53,15 @@ namespace XChange.Api.Models
             {
                 entity.Property(e => e.AddressId).HasColumnName("AddressID");
 
-                entity.Property(e => e.AdressType)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
+                entity.Property(e => e.AdressType).HasColumnType("text");
 
                 entity.Property(e => e.City)
                     .IsRequired()
-                    .HasMaxLength(45)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Country)
-                    .HasMaxLength(45)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PostalCode)
@@ -72,13 +70,12 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.State)
                     .IsRequired()
-                    .HasMaxLength(45)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Street)
                     .IsRequired()
-                    .HasMaxLength(45)
-                    .IsUnicode(false);
+                    .HasColumnType("text");
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
             });

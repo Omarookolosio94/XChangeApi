@@ -122,14 +122,20 @@ namespace XChange.Api.Repositories.Concretes
             }
         }
 
-        public async Task<bool> DeleteProduct(int sellerId , int productId)
+        public async Task<bool> DeleteProduct(int sellerId, int productId)
         {
             try
             {
                 var product = Query().Where(o => o.ProductId == productId && o.SellerId == sellerId);
-                DeleteRange(product);
-                await Commit();
-                return true;
+
+                if (product.Count() > 0)
+                {
+                    DeleteRange(product);
+                    await Commit();
+                    return true;
+                }
+
+                return false;
             }
             catch (Exception ex)
             {

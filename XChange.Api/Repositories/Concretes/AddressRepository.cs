@@ -132,5 +132,28 @@ namespace XChange.Api.Repositories.Concretes
             }
 
         }
+
+        public async Task<bool> DeleteAddress(int userId, int addressId)
+        {
+            try
+            {
+                var address = Query().Where(o => o.AddressId == addressId && o.UserId == userId);
+
+                if (address.Count() > 0)
+                {
+                    DeleteRange(address);
+                    await Commit();
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "DeleteAddress", "Error Deleting Address " + ex + "\n");
+                throw;
+            }
+        }
+
     }
 }

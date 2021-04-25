@@ -66,7 +66,7 @@ namespace XChange.Api.Services.Concretes
                 catch
                 {
                     new Logger().LogError(ModuleName, "Send Email", "Error  sending email" + "\n");
-                    throw;
+                    return;
                 }
                 finally
                 {
