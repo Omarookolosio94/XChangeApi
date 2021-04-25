@@ -161,6 +161,63 @@
              <response code="400">Pass in required information</response>
              <response code="404">User's profile not found</response>
         </member>
+        <member name="M:XChange.Api.Controllers.ProductsController.Products">
+            <summary>
+            Get list of all products
+            </summary>
+            <returns>Details of all products</returns>
+            <response code="200">Details of all products</response>
+            <response code="500">An error occured, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ProductsController.SearchProducts(System.String)">
+            <summary>
+            Search for Products
+            </summary>
+            <returns>List of Products that matches request</returns>
+            <response code="200">List of products or match not found</response>
+            <response code="500">An error occurred , try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ProductsController.GetProductBySeller(System.Int32)">
+            <summary>
+            Get products of a seller
+            </summary>
+            <returns>Details of products by a given seller</returns>
+            <response code="200">Details of all products by a seller or no product has been listed by seller</response>
+            <response code="404">An error occurred , please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ProductsController.GetProduct(System.Int32)">
+            <summary>
+            Get single product
+            </summary>
+            <returns>Details of product</returns>
+            <response code="200">Details of product</response>
+            <response code="404">product not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ProductsController.Products(XChange.Api.DTO.Product)">
+             <summary>
+             Creates a new product
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST api/products
+                 
+                 {
+                    "Category":"",
+                    "ProductName": "",
+                    "Quantity": 1,
+                    "UnitPrice": 200,
+                    "ProductDescription": "",
+                    "UnitsInStock": 10,
+                    "UnitsInOrder": 0,
+                 }
+            
+             </remarks>
+             <returns>New  product</returns>
+             <response code="201">Newly created product</response>
+             <response code="400">Pass in required information</response>
+             <response code="404">seller not found</response>
+        </member>
         <member name="M:XChange.Api.Controllers.SellerAccountController.SellerAccount">
             <summary>
             Get seller account of user

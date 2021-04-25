@@ -16,7 +16,6 @@ using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
 {
-    [AllowAnonymous]
     [Route("api/account")]
     [ApiController]
     [Produces("application/json")]
@@ -46,6 +45,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Account()
         {
             var result = _buyersService.GetBuyers();
@@ -64,7 +64,6 @@ namespace XChange.Api.Controllers
         }
 
 
-
         /// <summary>
         /// Search for Buyers
         /// </summary>
@@ -75,6 +74,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> SearchAccount([FromQuery] string search)
         {
 
@@ -113,6 +113,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public IActionResult GetBuyer(int userId)
         {
 
@@ -158,6 +159,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [Authorize(Roles = "B")]
         public async Task<IActionResult> Account(int userId, [FromBody] Buyer buyer)
         {
             ModelError errors;
@@ -317,6 +319,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [Authorize(Roles = "B")]
         public async Task<IActionResult> Account(int userId, [FromBody] UpdateBuyer buyer)
         {
             ModelError errors;

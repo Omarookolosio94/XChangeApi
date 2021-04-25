@@ -22,7 +22,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace XChange.Api.Controllers
 {
-    [AllowAnonymous]
     [Route("api/users")]
     [ApiController]
     [Produces("application/json")]
@@ -61,6 +60,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult users()
         {
             var result = _usersService.GetUsers();
@@ -108,6 +108,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Users([FromBody] User user)
         {
             ModelError errors;
@@ -252,6 +253,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public IActionResult GetUser(int userId)
         {
 
@@ -294,6 +296,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Otp([FromBody] OtpVerify otpVerify)
         {
 
@@ -360,6 +363,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Otp(string email)
         {
             ApiResponse response;
@@ -419,6 +423,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Password(string email)
         {
             ApiResponse response;
@@ -466,7 +471,6 @@ namespace XChange.Api.Controllers
         }
 
 
-
         /// <summary>
         /// Reset password
         /// </summary>
@@ -489,6 +493,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Password([FromBody] ResetPassword resetPassword)
         {
             ApiResponse response;
@@ -550,6 +555,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
             ApiResponse response;
@@ -578,7 +584,6 @@ namespace XChange.Api.Controllers
             response = new ApiResponse(400, "An error occurred, Please Try Again");
             return NotFound(response);
         }
-
 
         private async Task<Users> GetUserFromAccessToken(string accessToken)
         {
@@ -613,8 +618,7 @@ namespace XChange.Api.Controllers
 
             return new Users();
         }
-
-
+    
         private string GenerateAccessToken(Users user)
         { 
             var tokenHandler = new JwtSecurityTokenHandler();

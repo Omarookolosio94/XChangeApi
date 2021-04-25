@@ -313,9 +313,9 @@ namespace XChange.Api.Models
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Picture)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.LastUpdateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.Picture).HasColumnType("text");
 
                 entity.Property(e => e.ProductDescription).HasColumnType("text");
 
@@ -325,6 +325,10 @@ namespace XChange.Api.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SellerId).HasColumnName("SellerID");
+
+                entity.Property(e => e.TimeAdded)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 0)");
             });

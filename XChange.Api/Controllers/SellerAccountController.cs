@@ -46,6 +46,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> SellerAccount()
         {
             var result = _sellersService.GetSellers();
@@ -74,6 +75,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> SearchAccount([FromQuery] string search)
         {
 
@@ -111,6 +113,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public IActionResult GetSeller(int userId)
         {
 
@@ -157,6 +160,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [Authorize(Roles = "S")]
         public async Task<IActionResult> SellerAccount(int userId, [FromBody] Seller seller)
         {
             ModelError errors;
@@ -355,6 +359,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [Authorize(Roles = "S")]
         public async Task<IActionResult> SellerAccount(int userId, [FromBody] UpdateSeller seller)
         {
             ModelError errors;

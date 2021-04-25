@@ -16,7 +16,6 @@ using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
 {
-    [AllowAnonymous]
     [Route("api/address")]
     [ApiController]
     [Produces("application/json")]
@@ -46,6 +45,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Address()
         {
             var result = await _addressService.GetAllAddress();
@@ -73,6 +73,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> SearchAddress([FromQuery] string search)
         {
 
@@ -111,6 +112,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetSingleAddress(int addressId)
         {
 
@@ -140,6 +142,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public IActionResult GetAddressOfUser(int userId)
         {
 
@@ -216,6 +219,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Address(int userId, [FromBody] AddressDTO address)
         {
             ModelError errors;
@@ -356,8 +360,6 @@ namespace XChange.Api.Controllers
 
         }
 
-        //PUT api/address/{userID}/{addressId}
-        //update a given address
 
         /// <summary>
         /// Update address for user
@@ -385,6 +387,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
+        [AllowAnonymous]
         public async Task<IActionResult> Address(int userId,int addressId, [FromBody] AddressDTO address)
         {
             ModelError errors;

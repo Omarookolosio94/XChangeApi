@@ -41,6 +41,7 @@ namespace XChange.Api
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IRegistrationLogService, RegistrationLogService>();
             services.AddScoped<IOtpLogService, OtpLogService>();
+            services.AddScoped<IProductsService, ProductsService>();
 
             services.AddMvc(options =>
                     {
