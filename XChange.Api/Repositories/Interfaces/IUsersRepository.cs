@@ -15,6 +15,7 @@ namespace XChange.Api.Repositories.Interfaces
         Task<bool> IsEmailRegistered(string email);
         Task<Users> GetUserByEmail(string email);
         Task<bool> UpdateUser(Users user);
+        Task<int> GetUsersCount();
         //Task<Users> SearchUser(string searchParams);
 
     }

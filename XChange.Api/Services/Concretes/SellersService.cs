@@ -121,5 +121,19 @@ namespace XChange.Api.Services.Concretes
             }
 
         }
+
+        public async Task<int> GetSellersCount()
+        {
+            try
+            {
+                int count = await _sellersRepository.GetSellersCount();
+                return count;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
     }
 }

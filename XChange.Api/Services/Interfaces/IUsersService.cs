@@ -17,5 +17,6 @@ namespace XChange.Api.Services.Interfaces
         //Task<bool> UpdateUser(int userId, Users user);
         Task<bool> VerifyUser(int userId, bool isVerified);
         Task<bool> ResetPassword(string email, string password);
+        Task<int> GetUsersCount();
     }
 }

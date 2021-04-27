@@ -19,7 +19,6 @@ namespace XChange.Api.Controllers
     [AllowAnonymous]
     [Route("api/seller-account")]
     [ApiController]
-    [Produces("application/json")]
     public class SellerAccountController : ControllerBase
     {
         private readonly XChangeDatabaseContext dbContext = new XChangeDatabaseContext();
@@ -62,6 +61,20 @@ namespace XChange.Api.Controllers
                 return NotFound(response);
             }
 
+        }
+
+        /// <summary>
+        /// Get Count of all sellers
+        /// </summary>
+        /// <returns>Count of all sellers</returns>
+        /// <response code="200">Count of all sellers</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("count", Name = "GetSellersCount")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _sellersService.GetSellersCount();
+            return Ok(count);
         }
 
 

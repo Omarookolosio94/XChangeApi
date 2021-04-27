@@ -65,6 +65,21 @@ namespace XChange.Api.Controllers
 
 
         /// <summary>
+        /// Get Count of all Buyer Accounts
+        /// </summary>
+        /// <returns>Count of all buyer accounts</returns>
+        /// <response code="200">Count of all buyers account</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("count", Name = "GetBuyersCount")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _buyersService.GetBuyersCount();
+            return Ok(count);
+        }
+
+
+        /// <summary>
         /// Search for Buyers
         /// </summary>
         /// <returns>List of Buyers that matches request</returns>

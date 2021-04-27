@@ -20,7 +20,6 @@ namespace XChange.Api.Controllers
 {
     [Route("api/products")]
     [ApiController]
-    [Produces("application/json")]
     public class ProductsController : ControllerBase
     {
         private readonly XChangeDatabaseContext dbContext = new XChangeDatabaseContext();
@@ -63,6 +62,21 @@ namespace XChange.Api.Controllers
                 return NotFound(response);
             }
 
+        }
+
+
+        /// <summary>
+        /// Get Count of all products
+        /// </summary>
+        /// <returns>Count of all products</returns>
+        /// <response code="200">Count of all products</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("count", Name = "GetProductsCount")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _productsService.GetProductsCount();
+            return Ok(count);
         }
 
 

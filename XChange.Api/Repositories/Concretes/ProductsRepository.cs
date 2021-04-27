@@ -156,5 +156,19 @@ namespace XChange.Api.Repositories.Concretes
                 throw;
             }
         }
+
+        public async Task<int> GetProductsCount()
+        {
+            try
+            {
+                return Query().Count();
+
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "GetProductsCount", "Error getting products count exception error: " + ex + "/n");
+                return 0;
+            }
+        }
     }
 }

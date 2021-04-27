@@ -161,7 +161,20 @@ namespace XChange.Data.Services.Concretes
             }
         }
 
-    
+        public async Task<int> GetUsersCount()
+        {
+            try
+            {
+                int count = await _usersRepository.GetUsersCount();
+                return count;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+
 
     }
 }

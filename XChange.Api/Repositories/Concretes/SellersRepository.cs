@@ -105,5 +105,19 @@ namespace XChange.Api.Repositories.Concretes
             }
         }
 
+        public async Task<int> GetSellersCount()
+        {
+            try
+            {
+                return Query().Count();
+
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "GetSellersCount", "Error getting sellers count exception error: " + ex + "/n");
+                return 0;
+            }
+        }
+
     }
 }

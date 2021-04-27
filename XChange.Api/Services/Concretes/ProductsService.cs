@@ -128,5 +128,19 @@ namespace XChange.Api.Services.Concretes
                 throw;
             }
         }
+
+        public async Task<int> GetProductsCount()
+        {
+            try
+            {
+                int count = await _productsRepository.GetProductsCount();
+                return count;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
     }
 }

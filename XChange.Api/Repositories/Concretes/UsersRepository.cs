@@ -146,6 +146,18 @@ namespace XChange.Api.Repositories.Concretes
             }
         }
 
+        public async Task<int> GetUsersCount()
+        {
+            try
+            {
+                return Query().Count();
+
+            } catch(Exception ex)
+            {
+                new Logger().LogError(ModuleName, "GetUsersCount", "Error getting users count exception error: " + ex + "/n");
+                return 0;
+            }
+        }
 
 
     }

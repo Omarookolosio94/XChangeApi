@@ -24,7 +24,6 @@ namespace XChange.Api.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    [Produces("application/json")]
     public class UsersController : ControllerBase
     {
 
@@ -85,6 +84,19 @@ namespace XChange.Api.Controllers
 
         }
 
+        /// <summary>
+        /// Get Count of all registered users
+        /// </summary>
+        /// <returns>Count of all users</returns>
+        /// <response code="200">Count of all users</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("count" , Name ="GetUsersCount")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Count()
+        {
+            var count = await _usersService.GetUsersCount();
+            return Ok(count);
+        }
 
         /// <summary>
         /// Creates a new user

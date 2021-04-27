@@ -16,5 +16,6 @@ namespace XChange.Api.Repositories.Interfaces
         Task<Products> GetProduct(int productId);
         Task<bool> UpdateProduct(Products product);
         Task<bool> DeleteProduct(int sellerId , int productId);
+        Task<int> GetProductsCount();
     }
 }
