@@ -37,6 +37,7 @@ namespace XChange.Api
 
             services.AddSingleton(emailConfig);
             services.Configure<JWTSettings>(jwtSection);
+            services.AddSingleton<IGoogleCloudStorageService, GoogleCloudStorageService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IRegistrationLogService, RegistrationLogService>();

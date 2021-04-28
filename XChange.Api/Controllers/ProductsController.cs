@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -27,12 +28,14 @@ namespace XChange.Api.Controllers
         private readonly IUsersService _usersService;
         private readonly ISellersService _sellersService;
         private readonly IAuditLogService _auditLogService;
+        private readonly IGoogleCloudStorageService _googleCloudStorageService;
 
-        public ProductsController()
+        public ProductsController(IGoogleCloudStorageService googleCloudStorageService)
         {
             _productsService = new ProductsService(new ProductsRepository(dbContext));
             _sellersService = new SellersService(new SellersRepository(dbContext));
             _usersService = new UsersService(new UsersRepository(dbContext));
+            _googleCloudStorageService = googleCloudStorageService;
             _auditLogService = new AuditLogService(new AuditLogRepository(dbContext));
         }
 
@@ -216,7 +219,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
         [Authorize(Roles = "S")]
-        public async Task<IActionResult> Products([FromBody] Product product)
+        public async Task<IActionResult> Products([FromForm] Product product)
         {
             ModelError errors;
             List<Error> errorList = new List<Error> { };
@@ -310,6 +313,7 @@ namespace XChange.Api.Controllers
                 return BadRequest(errors);
             }
 
+
             //create Product Model
             Products newProduct = new Products
             {
@@ -325,6 +329,15 @@ namespace XChange.Api.Controllers
                 LastUpdateTime = DateTime.Now,
                 Ranking = 0
             };
+
+            //upload image to cloud and assign value to products
+            if (product.Picture != null)
+            {
+                var image = await UploadFile(product);
+
+                newProduct.PictureName = image.PictureName;
+                newProduct.PictureUrl = image.PictureUrl;
+            }
 
 
             var result = await _productsService.AddProduct(newProduct);
@@ -366,15 +379,13 @@ namespace XChange.Api.Controllers
         /// </remarks>
         /// <returns>Updated product</returns>
         /// <response code="201">Recently Updated product</response>
-        /// <response code="400">Pass in required information</response>
-        /// <response code="404">seller not found</response>
+        /// <response code="400">Pass in required information , product not found or you are not eligible to carry out this action</response>
         [HttpPut("{productId}" ,Name ="UpdateProduct")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
         [Authorize(Roles = "S")]
-        public async Task<IActionResult> Products(int productId , [FromBody] Product product)
+        public async Task<IActionResult> Products(int productId , [FromForm] Product product)
         {
             ModelError errors;
             List<Error> errorList = new List<Error> { };
@@ -387,10 +398,25 @@ namespace XChange.Api.Controllers
             //get sellers details
             var seller = await _sellersService.GetSeller(Convert.ToInt32(userId));
 
+            //product check
+            var checkProduct = await _productsService.GetProduct(productId);
+
+            if(checkProduct == null)
+            {
+                response = new ApiResponse(400, "Product was not found");
+                return BadRequest(response);
+            }
+
             if (seller == null)
             {
-                response = new ApiResponse(404, "You are not eligible to carry out this action");
-                return NotFound(response);
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
+                return BadRequest(response);
+            }
+
+            if(checkProduct.SellerId != seller.SellerId)
+            {
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
+                return BadRequest(response);
             }
 
             //validate ProductName
@@ -478,12 +504,30 @@ namespace XChange.Api.Controllers
                 UnitPrice = product.UnitPrice,
                 UnitsInOrder = product.UnitsInOrder,
                 UnitsInStock = product.UnitsInStock,
+                ProductId = productId
             };
+
+            //upload image to cloud and assign value to products
+            if (product.Picture != null)
+            {
+                //Delete Previous Image from google cloud
+                if (checkProduct.PictureName != null)
+                {
+                    await _googleCloudStorageService.DeleteFileAsync(checkProduct.PictureName);
+                }
+
+                var image = await UploadFile(product);
+                updateProduct.PictureUrl = image.PictureUrl;
+                updateProduct.PictureName = image.PictureName;
+
+            }
+
 
             var result = await _productsService.UpdateProduct(seller.SellerId , updateProduct);
 
             if (result)
             {
+               
                 //add audit log
                 AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), seller.Email, "Updated product: " + updateProduct.ProductName);
                 _auditLogService.AddAuditLog(auditLog);
@@ -493,6 +537,15 @@ namespace XChange.Api.Controllers
             }
             else
             {
+                //Delete Upload File from google storage
+                if (product.Picture != null)
+                {
+                    if (updateProduct.PictureName != null)
+                    {
+                        await _googleCloudStorageService.DeleteFileAsync(updateProduct.PictureName);
+                    }
+                }
+
                 response = new ApiResponse(400, "Product update failed , you may not be eligible for performing this action.");
                 return BadRequest(response);
             }
@@ -517,16 +570,32 @@ namespace XChange.Api.Controllers
             var userId = User.Claims.Where(a => a.Type == ClaimTypes.Name).FirstOrDefault().Value;
             var seller = await _sellersService.GetSeller(Convert.ToInt32(userId));
 
+            //get product
+            var checkProduct = await _productsService.GetProduct(productId);
+
+            if(checkProduct == null)
+            {
+                response = new ApiResponse(400, "Product does not exist");
+                return BadRequest(response);
+            }
+
             if (seller == null)
             {
                 response = new ApiResponse(400, "You are not eligible to carry out this action");
-                return NotFound(response);
+                return BadRequest(response);
             }
 
             var result = await _productsService.DeleteProduct(seller.SellerId, productId);
 
             if (result)
             {
+                //Delete Image from google cloud
+
+                if (checkProduct.PictureName != null)
+                {
+                    await _googleCloudStorageService.DeleteFileAsync(checkProduct.PictureName);
+                }
+
                 //add audit log
                 AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), seller.Email, "Deleted product: " + productId);
                 _auditLogService.AddAuditLog(auditLog);
@@ -536,10 +605,50 @@ namespace XChange.Api.Controllers
             }
             else
             {
-                response = new ApiResponse(400, "Product does not exist or you are not eligible to carry out this action");
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
                 return BadRequest(response);
             }
 
+        }
+
+   
+
+        [AllowAnonymous]
+        [HttpDelete("Delete", Name = "DeleteProductImage")]
+        public async Task<IActionResult> DeleteImage(string imageName)
+        {
+            await _googleCloudStorageService.DeleteFileAsync(imageName);
+
+            ApiResponse response = new ApiResponse(200  ,"File has been deleted from google cloud");
+            return Ok();
+        }
+
+
+
+
+        private async Task<PictureResponse> UploadFile(Product product)
+        {
+            string imageNameForStorage = FormFileName(product.ProductName, product.Picture.FileName);
+
+            var imageUrl = await _googleCloudStorageService.UploadFileAsync(product.Picture, imageNameForStorage);
+            var imageName = imageNameForStorage;
+
+            PictureResponse response = new PictureResponse
+            {
+                PictureName = imageName,
+                PictureUrl = imageUrl
+            };
+
+
+            return response;
+        }
+
+        private static string FormFileName(string productName, string fileName)
+        {
+            var fileExtension = Path.GetExtension(fileName);
+
+            var imageNameForStorage = $"{productName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}{fileExtension}";
+            return imageNameForStorage;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace XChange.Api.DTO
         public string ProductDescription { get; set; }
         public int? UnitsInStock { get; set; }
         public int? UnitsInOrder { get; set; }
-        public string Picture { get; set; }
+        public IFormFile Picture { get; set; }
+
     }
 }

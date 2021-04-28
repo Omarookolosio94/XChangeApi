@@ -149,6 +149,7 @@ namespace XChange.Api.Repositories.Concretes
             try
             {
                 return Query().Where(o => o.ProductId == productId && o.SellerId == sellerId).FirstOrDefault();
+
             }
             catch (Exception ex)
             {

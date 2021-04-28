@@ -312,7 +312,9 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.LastUpdateTime).HasColumnType("datetime");
 
-                entity.Property(e => e.Picture).HasColumnType("text");
+                entity.Property(e => e.PictureName).HasColumnType("text");
+
+                entity.Property(e => e.PictureUrl).HasColumnType("text");
 
                 entity.Property(e => e.ProductDescription).HasColumnType("text");
 

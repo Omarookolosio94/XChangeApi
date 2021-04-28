@@ -102,7 +102,8 @@ namespace XChange.Api.Services.Concretes
                     updateProduct.UnitPrice = product.UnitPrice;
                     updateProduct.UnitsInOrder = product.UnitsInOrder;
                     updateProduct.UnitsInStock = product.UnitsInStock;
-                    updateProduct.Picture = product.Picture;
+                    updateProduct.PictureUrl = product.PictureUrl;
+                    updateProduct.PictureName = product.PictureName;
                     updateProduct.LastUpdateTime = DateTime.Now;
 
                     result = await _productsRepository.UpdateProduct(updateProduct);

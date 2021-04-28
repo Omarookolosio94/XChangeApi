@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "cloudimageupload",
+  "private_key_id": "6d30bae2750b83778731617c577a004ff30cf032",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCd6woFRmylw2/3\ndK1UlPXaI1YfhZvi+hem88btp2ozGB/fj5cocsR9ZKxiy3Ww0cCMb9hOZO6eftDV\nRaZtScLFFCIYCG93rukePl9SVRTOPz0oS/kTNh8YEU5IbMw82Ty2a5uKeiZ11Vqk\nMlxfjdu7bjM8wzYPhtRAKnpO+fVQJzPAM/TGd9e7263SQ3yTRXD3QoKn4pIK5BpQ\nggzLECxO2QaOkrPrNf5OKjahfKwl8tm0I1KmOU5t4N558kqi3+VIaWFUHMeLxN2i\nbwCPMLRRTAofBBUpC2lqVvh9ngZmJyZodespWMBgeLDg7V1J2vqLBb6ffXuKCvXC\nwhFOxDulAgMBAAECggEADrBeLj9uu7yCHbJsrQFuHOxMhoIXDfXVXWIvjsuTxUzp\nKhJhLRH/1OoYXtguClR4ZJfCtwgMahHBuxTPdjr2Mv68bR/bvnY2mOmUVEQ1uzmG\npsjqUi8mlUaG0ZXNKZvLWeyIe0kBatR9qehFT14SokyN14kQ7kDMXWuWFOKLPvlB\nEHGhIJRKf+QXs0P6VU3vEKH/wUcdPi08t3fDW7OSTsOgx6c9XeYzgWTOXNlwtojW\nQ7trdT65CoYnVxCPXV1vfBDbjSKdZTwa10fFthHQasV2LBmNWc4P0HYPl7jfaKrL\ngMe0qFSN26HIyPVXQqgyDBKVPjVPTA0LvWZJUfgeAQKBgQDUmhKv+tZegnA2SGyj\n/q6efr0TxkLaQikLbN4yWxUiZRatBbpBXc1qf9XCKU5oXqZk4sp/PqFKaubmMTYZ\nRrcvUyZ/uJKbUWLojp4+hw3BxXfTu345ZsLUBWDuZWyH5yrz8J29hQ5vDgpKFb6Q\n2d2C5WFuJCl/RIDfCiw2fguqXQKBgQC+J1xU1CNcKAJUSjBPyqrLz9Nb7hoRmUGn\n43OxThgDxI31ngKRPqT9plZ7Hnz7Nm+HxoaM01hBcIhWeBwBvbiiEs+p7D8l2eZS\nVOGuowh4ZqBvb6ECls04D2GLMgrlPAl12Hcxq/dpgM740fsNRwatOJjWKOlBa/4A\nx/RQDc4R6QKBgFRd2+KX4O/aRVtVPD+L9pGQ68loGOlx7cXJ6xcCjA19HhWFO1dr\nOPP1TMdjCulh/hf047TBDtJwP7bDeptnM5SFI7b1cMBP+LceuW9Ius3VZerQ8ZMn\n01K926xe9UWtF598Mayem464fJ7PqDLlMgEas6I4mXsWnSllaQwq0shFAoGAeIJ9\nc41WM4tvnne+EnOAttYpPzOw9cJI59uwcIfrlEe3KBhRzDcFXXNTj4eM8bBYEpZw\no0M1xZNJ9HL+XOQd5SlCzo/YnWZxH3CH7qOINLXlq3n1cqybtpGY4hx+5zSbUkIz\nmBlCHWzyvqJlFs8SnikmQ2N+IGYOffQ7E5kMJjECgYApLIoiCm/vgZqXNGZqAXhF\nzB+oQGJi3YgQt3BHJx8pfbfcASKoat8SmDxgVXTIwov2tMafYSM3ePAWlZycdz4q\nfgg2tlWYYHvfL42hv+mEv9A2b0cny6t1lIOLZzUVlYlY8EGbZBPOAerKqyQnTrj4\nRYbq0zWLh6b3CEdnOvh9AA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "cloud-image-upload@cloudimageupload.iam.gserviceaccount.com",
+  "client_id": "117391766537391530327",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloud-image-upload%40cloudimageupload.iam.gserviceaccount.com"
+}

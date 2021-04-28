@@ -14,9 +14,10 @@ namespace XChange.Api.Models
         public string ProductDescription { get; set; }
         public int? UnitsInStock { get; set; }
         public int? UnitsInOrder { get; set; }
-        public string Picture { get; set; }
-        public int SellerId { get; set; }
+        public string PictureName { get; set; }
+        public string PictureUrl { get; set; }
         public DateTime? TimeAdded { get; set; }
         public DateTime? LastUpdateTime { get; set; }
+        public int SellerId { get; set; }
     }
 }

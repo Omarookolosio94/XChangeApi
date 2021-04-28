@@ -260,8 +260,7 @@
              </remarks>
              <returns>Updated product</returns>
              <response code="201">Recently Updated product</response>
-             <response code="400">Pass in required information</response>
-             <response code="404">seller not found</response>
+             <response code="400">Pass in required information , product not found or you are not eligible to carry out this action</response>
         </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products(System.Int32)">
             <summary>
