@@ -235,8 +235,7 @@
              </remarks>
              <returns>New  product</returns>
              <response code="201">Newly created product</response>
-             <response code="400">Pass in required information</response>
-             <response code="404">seller not found</response>
+             <response code="400">Pass in required information , You are not eligible to carry out this action</response>
         </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products(System.Int32,XChange.Api.DTO.Product)">
              <summary>
@@ -258,9 +257,26 @@
                  }
             
              </remarks>
-             <returns>Updated product</returns>
-             <response code="201">Recently Updated product</response>
-             <response code="400">Pass in required information , product not found or you are not eligible to carry out this action</response>
+             <returns>Updated product success message</returns>
+             <response code="200">Product update successful</response>
+             <response code="400">Pass in required information , product not found or you are not eligible to carry out this action , please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ProductsController.UploadProductPicture(System.Int32,XChange.Api.DTO.ImageUpload)">
+             <summary>
+             Updates a products picture
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 PUT api/products/{productId}/image
+                 {
+                    "Image": file
+                 }
+            
+             </remarks>
+             <returns>Updated product image success message</returns>
+             <response code="200">Product picture update successful</response>
+             <response code="400">Pass in required information , product not found , you are not eligible to carry out this action or please try again</response>
         </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products(System.Int32)">
             <summary>

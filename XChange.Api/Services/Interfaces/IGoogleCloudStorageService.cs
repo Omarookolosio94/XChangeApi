@@ -8,7 +8,7 @@ namespace XChange.Api.Services.Interfaces
 {
     public interface IGoogleCloudStorageService
     {
-        Task<string> UploadFileAsync(IFormFile image, string imageName);
-        Task DeleteFileAsync(string imageName);
+        Task<string> UploadFileAsync(IFormFile file, string fileName);
+        Task DeleteFileAsync(string fileName);
     }
 }

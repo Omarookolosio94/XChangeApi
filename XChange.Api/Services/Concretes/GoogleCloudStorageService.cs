@@ -24,19 +24,19 @@ namespace XChange.Api.Services.Concretes
             bucketName = configuration.GetValue<string>("GoogleCloudStorageBucket");
         }
 
-        public async Task<string> UploadFileAsync(IFormFile image, string imageName)
+        public async Task<string> UploadFileAsync(IFormFile file, string fileName)
         {
             using (var memoryStream = new MemoryStream())
             {
-                await image.CopyToAsync(memoryStream);
-                var dataObject = await storageClient.UploadObjectAsync(bucketName, imageName, null, memoryStream);
+                await file.CopyToAsync(memoryStream);
+                var dataObject = await storageClient.UploadObjectAsync(bucketName, fileName, null, memoryStream);
                 return dataObject.MediaLink;
             }
         }
 
-        public async Task DeleteFileAsync(string imageName)
+        public async Task DeleteFileAsync(string fileName)
         {
-            await storageClient.DeleteObjectAsync(bucketName, imageName);
+            await storageClient.DeleteObjectAsync(bucketName, fileName);
         }
     }
 }

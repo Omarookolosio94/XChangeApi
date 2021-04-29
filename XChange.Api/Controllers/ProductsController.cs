@@ -211,12 +211,10 @@ namespace XChange.Api.Controllers
         /// </remarks>
         /// <returns>New  product</returns>
         /// <response code="201">Newly created product</response>
-        /// <response code="400">Pass in required information</response>
-        /// <response code="404">seller not found</response>
+        /// <response code="400">Pass in required information , You are not eligible to carry out this action</response>
         [HttpPost(Name ="AddProduct")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
         [Authorize(Roles = "S")]
         public async Task<IActionResult> Products([FromForm] Product product)
@@ -234,8 +232,8 @@ namespace XChange.Api.Controllers
 
             if (seller == null)
             {
-                response = new ApiResponse(404, "Seller not found");
-                return NotFound(response);
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
+                return BadRequest(response);
             }
 
             //validate ProductName
@@ -377,11 +375,11 @@ namespace XChange.Api.Controllers
         ///     }
         ///
         /// </remarks>
-        /// <returns>Updated product</returns>
-        /// <response code="201">Recently Updated product</response>
-        /// <response code="400">Pass in required information , product not found or you are not eligible to carry out this action</response>
+        /// <returns>Updated product success message</returns>
+        /// <response code="200">Product update successful</response>
+        /// <response code="400">Pass in required information , product not found or you are not eligible to carry out this action , please try again</response>
         [HttpPut("{productId}" ,Name ="UpdateProduct")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
         [Authorize(Roles = "S")]
@@ -546,7 +544,105 @@ namespace XChange.Api.Controllers
                     }
                 }
 
-                response = new ApiResponse(400, "Product update failed , you may not be eligible for performing this action.");
+                response = new ApiResponse(400, "Product update failed , please try again");
+                return BadRequest(response);
+            }
+
+        }
+
+
+        /// <summary>
+        /// Updates a products picture
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT api/products/{productId}/image
+        ///     {
+        ///        "Image": file
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns>Updated product image success message</returns>
+        /// <response code="200">Product picture update successful</response>
+        /// <response code="400">Pass in required information , product not found , you are not eligible to carry out this action or please try again</response>
+        [HttpPut("{productId}/image", Name = "UploadProductPicuture")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
+        [Authorize(Roles = "S")]
+        public async Task<IActionResult> UploadProductPicture(int productId, [FromForm] ImageUpload image)
+        {
+            ApiResponse response;
+
+            //Get user Id from token
+            var userId = User.Claims.Where(a => a.Type == ClaimTypes.Name).FirstOrDefault().Value;
+
+            //get sellers details
+            var seller = await _sellersService.GetSeller(Convert.ToInt32(userId));
+
+            //product check
+            var checkProduct = await _productsService.GetProduct(productId);
+
+            if (checkProduct == null)
+            {
+                response = new ApiResponse(400, "Product was not found");
+                return BadRequest(response);
+            }
+
+            if (seller == null)
+            {
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
+                return BadRequest(response);
+            }
+
+            if (checkProduct.SellerId != seller.SellerId)
+            {
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
+                return BadRequest(response);
+            }
+ 
+ 
+            //upload image to cloud and assign value to products
+            if (image.Image != null)
+            {
+                //Delete Previous Image from google cloud
+                if (checkProduct.PictureName != null)
+                {
+                    await _googleCloudStorageService.DeleteFileAsync(checkProduct.PictureName);
+                }
+
+                var updateImage = await UploadFile(checkProduct.ProductName , image.Image);
+
+                checkProduct.PictureUrl = updateImage.PictureUrl;
+                checkProduct.PictureName = updateImage.PictureName;
+            }
+
+
+            var result = await _productsService.UpdateProduct(seller.SellerId, checkProduct);
+
+            if (result)
+            {
+
+                //add audit log
+                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), seller.Email, "Added product picture: " + checkProduct.ProductName);
+                _auditLogService.AddAuditLog(auditLog);
+
+                response = new ApiResponse(200, "Product picture update successful");
+                return Ok(response);
+            }
+            else
+            {
+                //Delete Upload File from google storage
+                if (image.Image != null)
+                {
+                    if (checkProduct.PictureName != null)
+                    {
+                        await _googleCloudStorageService.DeleteFileAsync(checkProduct.PictureName);
+                    }
+                }
+
+                response = new ApiResponse(400, "Product picture update failed , try again");
                 return BadRequest(response);
             }
 
@@ -611,21 +707,6 @@ namespace XChange.Api.Controllers
 
         }
 
-   
-
-        [AllowAnonymous]
-        [HttpDelete("Delete", Name = "DeleteProductImage")]
-        public async Task<IActionResult> DeleteImage(string imageName)
-        {
-            await _googleCloudStorageService.DeleteFileAsync(imageName);
-
-            ApiResponse response = new ApiResponse(200  ,"File has been deleted from google cloud");
-            return Ok();
-        }
-
-
-
-
         private async Task<PictureResponse> UploadFile(Product product)
         {
             string imageNameForStorage = FormFileName(product.ProductName, product.Picture.FileName);
@@ -643,11 +724,30 @@ namespace XChange.Api.Controllers
             return response;
         }
 
+        private async Task<PictureResponse> UploadFile(string productName, IFormFile file )
+        {
+            string imageNameForStorage = FormFileName(productName, file.FileName);
+
+            var imageUrl = await _googleCloudStorageService.UploadFileAsync(file, imageNameForStorage);
+            var imageName = imageNameForStorage;
+
+            PictureResponse response = new PictureResponse
+            {
+                PictureName = imageName,
+                PictureUrl = imageUrl
+            };
+
+
+            return response;
+        }
+
+
         private static string FormFileName(string productName, string fileName)
         {
             var fileExtension = Path.GetExtension(fileName);
+            var name = Path.GetFileNameWithoutExtension(fileName);
 
-            var imageNameForStorage = $"{productName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}{fileExtension}";
+            var imageNameForStorage = $"{name}--{productName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}{fileExtension}";
             return imageNameForStorage;
         }
     }
