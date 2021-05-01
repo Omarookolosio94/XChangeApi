@@ -97,7 +97,6 @@ namespace XChange.Api.Services.Concretes
                     updateProduct.ProductDescription = product.ProductDescription;
                     updateProduct.Category = product.Category;
                     updateProduct.Quantity = product.Quantity;
-                    //updateProduct.Ranking = product.Ranking;
                     updateProduct.Quantity = product.Quantity;
                     updateProduct.UnitPrice = product.UnitPrice;
                     updateProduct.UnitsInOrder = product.UnitsInOrder;
@@ -143,5 +142,53 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
+        public async Task<bool> UpdateProductRating(int rating, int productId)
+        {
+            try
+            {
+                bool result = false;
+                Products updateProduct = await _productsRepository.GetProduct(productId);
+
+                if (updateProduct != null)
+                {
+
+                    var newRating = Utility.Utility.CalculateProductRating(updateProduct.Rating, rating);
+
+                    updateProduct.Rating = newRating;
+                    updateProduct.LastUpdateTime = DateTime.Now;
+
+                    result = await _productsRepository.UpdateProduct(updateProduct);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> UpdateProductRatingReview(string rating, int productId)
+        {
+            try
+            {
+                bool result = true;
+                Products updateProduct = await _productsRepository.GetProduct(productId);
+
+                if (updateProduct != null)
+                {
+                    updateProduct.Rating = rating;
+                    updateProduct.LastUpdateTime = DateTime.Now;
+
+                    result = await _productsRepository.UpdateProduct(updateProduct);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
+        }
     }
 }

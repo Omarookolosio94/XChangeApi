@@ -5,3 +5,14 @@
 
 Install-Package MailKit
 Install-Package MimeKit
+
+
+
+TODO:
+
+Add validation for images: 
+   - check for file type during upload
+   - check for file size not more than 5mb
+
+
+Safely manage users credentials

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Security.Cryptography;
 using XChange.Api.DTO;
 using XChange.Api.Models;
@@ -116,5 +117,39 @@ namespace XChange.Api.Utility
             return refreshToken;
         }
 
+        public static string CalculateProductRating(string currentRating , int rating)
+        {
+            double doubleRating = Convert.ToDouble(currentRating);
+            var totalRating = doubleRating + rating;
+            var newRating = totalRating / (double)2;
+
+            newRating = Math.Round(newRating, 2);
+            return newRating.ToString();
+        }
+
+        public static string CalculatePreviousRating(string currentRating , string rating)
+        {
+            //rating is the value for previous rating
+            //current rating is value of current product rating
+
+            double doubleRating = Convert.ToDouble(currentRating);
+            doubleRating = doubleRating * 2;
+            var previousRating = doubleRating - Convert.ToDouble(rating);
+
+            previousRating = Math.Round(previousRating, 2);
+            return previousRating.ToString();
+        }
+
+        public static string CalculateUpdateRating(string productRating , string previousRating , string currentRating)
+        {
+            //product rating is the value of current product rating
+            //previous rating is the current value of user rating on product
+            //current rating is the new value of user rating on product
+
+            string revertRating = CalculatePreviousRating(productRating, previousRating);
+            string updateRating = CalculateProductRating(revertRating , Convert.ToInt32(currentRating));
+
+            return updateRating;
+        }
     }
 }

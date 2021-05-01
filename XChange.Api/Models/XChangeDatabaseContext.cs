@@ -42,7 +42,7 @@ namespace XChange.Api.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=XChangeDatabase;Integrated Security=True;");
             }
         }
@@ -323,6 +323,11 @@ namespace XChange.Api.Models
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Rating)
+                    .IsRequired()
+                    .HasMaxLength(5)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.SellerId).HasColumnName("SellerID");
 
                 entity.Property(e => e.TimeAdded)
@@ -383,12 +388,20 @@ namespace XChange.Api.Models
                     .HasMaxLength(45)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LastUpdateTime).HasColumnType("datetime");
+
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
                 entity.Property(e => e.Rating)
                     .IsRequired()
                     .HasMaxLength(1)
                     .IsUnicode(false);
+
+                entity.Property(e => e.TimeAdded)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
             });
 
             modelBuilder.Entity<Sellers>(entity =>

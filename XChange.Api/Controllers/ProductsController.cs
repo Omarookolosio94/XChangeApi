@@ -325,7 +325,7 @@ namespace XChange.Api.Controllers
                 UnitsInStock = product.UnitsInStock,
                 SellerId = seller.SellerId,
                 LastUpdateTime = DateTime.Now,
-                Ranking = 0
+                Rating = "0"
             };
 
             //upload image to cloud and assign value to products
@@ -707,6 +707,20 @@ namespace XChange.Api.Controllers
 
         }
 
+        [HttpPost("{productId}/rating" , Name ="UpdateProductRanking")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateRanking(int productId , int rating)
+        {
+            var result = await _productsService.UpdateProductRating(rating, productId);
+
+            if (result)
+            {
+                return Ok("Product updated");
+            }
+
+            return BadRequest("Product rating update failed");
+        }
+
         private async Task<PictureResponse> UploadFile(Product product)
         {
             string imageNameForStorage = FormFileName(product.ProductName, product.Picture.FileName);
@@ -750,5 +764,6 @@ namespace XChange.Api.Controllers
             var imageNameForStorage = $"{name}--{productName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}{fileExtension}";
             return imageNameForStorage;
         }
+
     }
 }
