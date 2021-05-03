@@ -13,7 +13,9 @@ namespace XChange.Api.Services.Interfaces
         Task<Reviews> GetReview(int reviewId);
         Task<List<Reviews>> GetReviewsOfProduct(int productId);
         Task<List<Reviews>> GetReviewsByUser(int userId);
-        Task<bool> UpdateReview(int userId , string productPreviousRating , Reviews review);
+        Task<bool> UpdateReview(Reviews review);
         Task<bool> DeleteReview(int userId, int reviewId);
+        Task<int> GetReviewsCount();
+        Task<int> GetReviewsOfProductCount(int productId);
     }
 }

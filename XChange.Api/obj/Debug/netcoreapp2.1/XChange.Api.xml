@@ -286,6 +286,20 @@
             <response code="200">Product has been deleted successfully</response>
             <response code="400">Product does not exist or you are not eligible to carry out this action</response>
         </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.ReviewsCount">
+            <summary>
+            Get Count of all reviews
+            </summary>
+            <returns>Count of all reviews</returns>
+            <response code="200">Count of all reviews</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.ProductReviewsCount(System.Int32)">
+            <summary>
+            Get Count of all reviews for a given product
+            </summary>
+            <returns>Count of all reviews for a given product</returns>
+            <response code="200">Count of all reviews for a given product</response>
+        </member>
         <member name="M:XChange.Api.Controllers.ReviewsController.Reviews">
             <summary>
             Get list of all reviews
@@ -339,7 +353,7 @@
         </member>
         <member name="M:XChange.Api.Controllers.ReviewsController.UpdateReview(System.Int32,XChange.Api.DTO.Review)">
              <summary>
-             Adds a new product review
+             Updates a product review
              </summary>
              <remarks>
              Sample request:
@@ -352,9 +366,17 @@
                  }
             
              </remarks>
-             <returns>Added product review success message</returns>
-             <response code="201">Return new created review</response>
+             <returns>Updated product review success message</returns>
+             <response code="201">Return product update success message</response>
              <response code="400">Product not found , Pass in required information , please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.Reviews(System.Int32)">
+            <summary>
+            Deletes a review
+            </summary>
+            <returns>Delete success message</returns>
+            <response code="200">Product review has been deleted successfully</response>
+            <response code="400">Product review does not exist or you are not eligible to carry out this action</response>
         </member>
         <member name="M:XChange.Api.Controllers.SellerAccountController.SellerAccount">
             <summary>

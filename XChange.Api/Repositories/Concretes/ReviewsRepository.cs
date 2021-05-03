@@ -142,5 +142,33 @@ namespace XChange.Api.Repositories.Concretes
                 throw;
             }
         }
+
+        public async Task<int> GetReviewsCount()
+        {
+            try
+            {
+                return Query().Count();
+
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "GetReviewsCount", "Error getting reviews count exception error: " + ex + "/n");
+                return 0;
+            }
+        }
+
+        public async Task<int> GetReviewsOfProductCount(int productId)
+        {
+            try
+            {
+                return Query().Where(o => o.ProductId == productId).Count();
+
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "GetReviewsOfProduct", "Error getting reviews count of product exception error: " + ex + "/n");
+                return 0;
+            }
+        }
     }
 }

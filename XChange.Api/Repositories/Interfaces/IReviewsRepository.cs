@@ -16,5 +16,7 @@ namespace XChange.Api.Repositories.Interfaces
         Task<Reviews> GetSingleReviewByUser(int userId, int reviewId);
         Task<bool> UpdateReview(Reviews review);
         Task<bool> DeleteReview(int userId, int reviewId);
+        Task<int> GetReviewsCount();
+        Task<int> GetReviewsOfProductCount(int productId);
     }
 }

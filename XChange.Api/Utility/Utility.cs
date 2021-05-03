@@ -147,6 +147,7 @@ namespace XChange.Api.Utility
             //current rating is the new value of user rating on product
 
             string revertRating = CalculatePreviousRating(productRating, previousRating);
+
             string updateRating = CalculateProductRating(revertRating , Convert.ToInt32(currentRating));
 
             return updateRating;
