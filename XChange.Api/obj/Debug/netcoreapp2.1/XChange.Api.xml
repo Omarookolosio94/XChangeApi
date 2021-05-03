@@ -286,6 +286,76 @@
             <response code="200">Product has been deleted successfully</response>
             <response code="400">Product does not exist or you are not eligible to carry out this action</response>
         </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.Reviews">
+            <summary>
+            Get list of all reviews
+            </summary>
+            <returns>Details of all reviews</returns>
+            <response code="200">Details of all reviews</response>
+            <response code="400">An error occured, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.GetReviewsByBuyer(System.Int32)">
+            <summary>
+            Get Review of a user
+            </summary>
+            <returns>Details of all reviews by a given customer</returns>
+            <response code="200">Details of all reviews by a customer or  User has not written any review yet</response>
+            <response code="400">An error occurred , please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.GetReviewsForProduct(System.Int32)">
+            <summary>
+            Get all reviews for a product
+            </summary>
+            <returns>Details of all reviews for a given product</returns>
+            <response code="200">Details of all reviews for a given product or  no reviews for product yet</response>
+            <response code="400">An error occurred , please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.GetReview(System.Int32)">
+            <summary>
+            Get a review
+            </summary>
+            <returns>Details of review</returns>
+            <response code="200">Details of review</response>
+            <response code="404">Review not found</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.Reviews(System.Int32,XChange.Api.DTO.Review)">
+             <summary>
+             Adds a new product review
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 PUT api/review/{productId}
+                 
+                 {
+                    "CustomerReview":"",
+                    "Rating": "",
+                 }
+            
+             </remarks>
+             <returns>Added product review success message</returns>
+             <response code="201">Return new created review</response>
+             <response code="400">Product not found , Pass in required information , please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.ReviewsController.UpdateReview(System.Int32,XChange.Api.DTO.Review)">
+             <summary>
+             Adds a new product review
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 PUT api/review/{productId}
+                 
+                 {
+                    "CustomerReview":"",
+                    "Rating": "",
+                 }
+            
+             </remarks>
+             <returns>Added product review success message</returns>
+             <response code="201">Return new created review</response>
+             <response code="400">Product not found , Pass in required information , please try again</response>
+        </member>
         <member name="M:XChange.Api.Controllers.SellerAccountController.SellerAccount">
             <summary>
             Get seller account of user

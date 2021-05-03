@@ -16,7 +16,7 @@ namespace XChange.Api.Services.Concretes
         private readonly IProductsService _productsService;
 
 
-        public ReviewsService(IReviewsRepository reviewsRepository , IProductsRepository productsRepository)
+        public ReviewsService(IReviewsRepository reviewsRepository)
         {
             _reviewsRepository = reviewsRepository;
             _productsService = new ProductsService(new ProductsRepository(dbContext));
@@ -27,6 +27,12 @@ namespace XChange.Api.Services.Concretes
             try
             {
                 var status = await _reviewsRepository.AddReview(review);
+
+                if (status)
+                {
+                    await _productsService.UpdateProductRating(Convert.ToInt32(review.Rating), review.ProductId);
+                }
+
                 return status;
             }
             catch (Exception ex)

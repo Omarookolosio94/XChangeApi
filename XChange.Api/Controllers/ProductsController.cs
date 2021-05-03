@@ -525,7 +525,6 @@ namespace XChange.Api.Controllers
 
             if (result)
             {
-               
                 //add audit log
                 AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), seller.Email, "Updated product: " + updateProduct.ProductName);
                 _auditLogService.AddAuditLog(auditLog);
@@ -705,20 +704,6 @@ namespace XChange.Api.Controllers
                 return BadRequest(response);
             }
 
-        }
-
-        [HttpPost("{productId}/rating" , Name ="UpdateProductRanking")]
-        [AllowAnonymous]
-        public async Task<IActionResult> UpdateRanking(int productId , int rating)
-        {
-            var result = await _productsService.UpdateProductRating(rating, productId);
-
-            if (result)
-            {
-                return Ok("Product updated");
-            }
-
-            return BadRequest("Product rating update failed");
         }
 
         private async Task<PictureResponse> UploadFile(Product product)

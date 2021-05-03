@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Utilities.Logger;
 using XChange.Api.Models;
 using XChange.Api.Repositories.Interfaces;
 using XChange.Api.Services.Interfaces;
@@ -10,6 +11,8 @@ namespace XChange.Api.Services.Concretes
 {
     public class ProductsService : IProductsService
     {
+        private static string ModuleName = "ProductsService";
+
         private readonly IProductsRepository _productsRepository;
 
         public ProductsService(IProductsRepository productsRepository)
@@ -146,7 +149,7 @@ namespace XChange.Api.Services.Concretes
         {
             try
             {
-                bool result = false;
+                bool result = true;
                 Products updateProduct = await _productsRepository.GetProduct(productId);
 
                 if (updateProduct != null)
@@ -164,7 +167,9 @@ namespace XChange.Api.Services.Concretes
             }
             catch (Exception ex)
             {
-                throw;
+                new Logger().LogError(ModuleName, "UpdateProductRating", "Error Updating ProductRating. Exception error: " + ex + "\n");
+                return true;
+                //throw;
             }
         }
 
@@ -187,6 +192,7 @@ namespace XChange.Api.Services.Concretes
             }
             catch (Exception ex)
             {
+                new Logger().LogError(ModuleName, "UpdateProductRatingReview", "Error Updating ProductRatingReview. Exception error: " + ex + "\n");
                 return true;
             }
         }
