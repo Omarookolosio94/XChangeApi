@@ -174,6 +174,77 @@
             <response code="200">Address has been deleted successfully</response>
             <response code="400">Address does not exist or you are not eligible to carry out this action</response>
         </member>
+        <member name="M:XChange.Api.Controllers.CartsController.GetCarts">
+            <summary>
+            Get all cart item
+            </summary>
+            <returns>List of all cart item</returns>
+            <response code="200">List of all cart item</response>
+            <response code="500">An error occured, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.CartsController.GetCartCount">
+            <summary>
+            Get Count of carts
+            </summary>
+            <returns>Count of carted products</returns>
+            <response code="200">Count of all carted products</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.CartsController.GetCountOfUserCart(System.Int32)">
+            <summary>
+            Get Count of user's cart
+            </summary>
+            <returns>Count of user's carted products</returns>
+            <response code="200">Count of user's carted products</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.CartsController.GetUserCart(System.Int32)">
+            <summary>
+            Get users cart
+            </summary>
+            <returns>Detail of user's cart</returns>
+            <response code="200">Details of products in user's cart or no item on cart </response>
+            <response code="400">An error occured</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.CartsController.GetUserCartFromAuth">
+            <summary>
+            Get users cart from auth headers
+            </summary>
+            <returns>Detail of user's cart</returns>
+            <response code="200">Details of products in user's cart or no item on cart </response>
+            <response code="400">An error occured</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.CartsController.AddItemToCart(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Adds or updates products in user's cart
+            </summary>
+            <returns>Success message</returns>
+            <response code="200">Product has been added to user's cart to has been updated in user's cart</response>
+            <response code="400">An error occurred , please try again</response>
+            <response code="400">Product does not exist</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.CartsController.EmptyUserCartFromAuth">
+            <summary>
+            Deletes a user's cart using Auth headers
+            </summary>
+            <returns>Delete success message</returns>
+            <response code="200">Cart has been deleted successfully</response>
+            <response code="400">Cart does not exist or you are not eligible to carry out this action</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.CartsController.EmptyUserCart(System.Int32)">
+            <summary>
+            Deletes a user's cart
+            </summary>
+            <returns>Delete success message</returns>
+            <response code="200">Cart has been deleted successfully</response>
+            <response code="400">You do not have a cart</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.CartsController.RemoveProductFromUserCart(System.Int32,System.Int32)">
+            <summary>
+            Deletes a user address
+            </summary>
+            <returns>Delete success message</returns>
+            <response code="200">Address has been deleted successfully</response>
+            <response code="400">Address does not exist or you are not eligible to carry out this action</response>
+        </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products">
             <summary>
             Get list of all products

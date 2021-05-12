@@ -196,5 +196,18 @@ namespace XChange.Api.Services.Concretes
                 return true;
             }
         }
+
+        public async Task<bool> IsProduct(int productId)
+        {
+            try
+            {
+                var status = await _productsRepository.IsProduct(productId);
+                return status;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }

@@ -18,12 +18,12 @@ namespace XChange.Api.Models
         public virtual DbSet<Address> Address { get; set; }
         public virtual DbSet<AuditLog> AuditLog { get; set; }
         public virtual DbSet<Buyers> Buyers { get; set; }
+        public virtual DbSet<Carts> Carts { get; set; }
         public virtual DbSet<CreditCards> CreditCards { get; set; }
         public virtual DbSet<Discounts> Discounts { get; set; }
         public virtual DbSet<GiftCards> GiftCards { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<Offers> Offers { get; set; }
-        public virtual DbSet<OrderHasProducts> OrderHasProducts { get; set; }
         public virtual DbSet<Orders> Orders { get; set; }
         public virtual DbSet<OtpLog> OtpLog { get; set; }
         public virtual DbSet<Payments> Payments { get; set; }
@@ -42,7 +42,7 @@ namespace XChange.Api.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=XChangeDatabase;Integrated Security=True;");
             }
         }
@@ -137,6 +137,19 @@ namespace XChange.Api.Models
                 entity.Property(e => e.UserId).HasColumnName("UserID");
             });
 
+            modelBuilder.Entity<Carts>(entity =>
+            {
+                entity.HasKey(e => e.CartId);
+
+                entity.Property(e => e.CartId).HasColumnName("Cart_Id");
+
+                entity.Property(e => e.ProductId).HasColumnName("Product_Id");
+
+                entity.Property(e => e.Quantity).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.UserId).HasColumnName("User_Id");
+            });
+
             modelBuilder.Entity<CreditCards>(entity =>
             {
                 entity.HasKey(e => e.CreditCardId);
@@ -220,46 +233,93 @@ namespace XChange.Api.Models
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
             });
 
-            modelBuilder.Entity<OrderHasProducts>(entity =>
-            {
-                entity.HasKey(e => e.OrderProductId);
-
-                entity.Property(e => e.OrderProductId).HasColumnName("OrderProductID");
-
-                entity.Property(e => e.OrderId).HasColumnName("OrderID");
-
-                entity.Property(e => e.ProductId).HasColumnName("ProductID");
-            });
-
             modelBuilder.Entity<Orders>(entity =>
             {
                 entity.HasKey(e => e.OrderId);
 
-                entity.Property(e => e.OrderId).HasColumnName("OrderID");
+                entity.Property(e => e.OrderId).HasColumnName("Order_Id");
 
-                entity.Property(e => e.Freight).HasColumnType("decimal(18, 0)");
+                entity.Property(e => e.BillingAddressId).HasColumnName("Billing_Address_Id");
 
-                entity.Property(e => e.OrderDate)
+                entity.Property(e => e.BillingPhone)
+                    .IsRequired()
+                    .HasColumnName("Billing_Phone")
+                    .HasColumnType("text");
+
+                entity.Property(e => e.CancelReason)
+                    .HasColumnName("Cancel_Reason")
+                    .HasColumnType("text");
+
+                entity.Property(e => e.CancelledAt)
+                    .HasColumnName("Cancelled_At")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.ClosedAt)
+                    .HasColumnName("Closed_At")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("Created_At")
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.PaymentDate).HasColumnType("datetime");
+                entity.Property(e => e.Currency)
+                    .HasMaxLength(3)
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('NGN')");
 
-                entity.Property(e => e.RequiredDate).HasColumnType("datetime");
-
-                entity.Property(e => e.SalesTax).HasColumnType("decimal(18, 0)");
-
-                entity.Property(e => e.ShipperId).HasColumnName("ShipperID");
-
-                entity.Property(e => e.TimeStamp)
-                    .IsRequired()
-                    .IsRowVersion();
-
-                entity.Property(e => e.TransactStatus)
-                    .HasMaxLength(45)
+                entity.Property(e => e.IpAddress)
+                    .HasColumnName("Ip_Address")
+                    .HasMaxLength(1)
                     .IsUnicode(false);
 
-                entity.Property(e => e.UserId).HasColumnName("UserID");
+                entity.Property(e => e.OrderStatus)
+                    .HasColumnName("Order_Status")
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('Pending')");
+
+                entity.Property(e => e.PaymentStatus)
+                    .HasColumnName("Payment_Status")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ProcessedAt)
+                    .HasColumnName("Processed_At")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.ProductsId)
+                    .HasColumnName("Products_Id")
+                    .HasColumnType("text");
+
+                entity.Property(e => e.ShipperId).HasColumnName("Shipper_Id");
+
+                entity.Property(e => e.ShippingAddressId).HasColumnName("Shipping_Address_Id");
+
+                entity.Property(e => e.Source)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SubtotalPrice)
+                    .HasColumnName("Subtotal_Price")
+                    .HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Summary).HasColumnType("text");
+
+                entity.Property(e => e.Tag).HasColumnType("text");
+
+                entity.Property(e => e.TotalPrice)
+                    .HasColumnName("Total_Price")
+                    .HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.TotalTax)
+                    .HasColumnName("Total_tax")
+                    .HasColumnType("decimal(18, 0)")
+                    .HasDefaultValueSql("((0.00))");
+
+                entity.Property(e => e.TotalWeight).HasColumnName("Total_Weight");
+
+                entity.Property(e => e.UserId).HasColumnName("User_Id");
             });
 
             modelBuilder.Entity<OtpLog>(entity =>
@@ -291,13 +351,51 @@ namespace XChange.Api.Models
             {
                 entity.HasKey(e => e.PaymentId);
 
-                entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
+                entity.Property(e => e.PaymentId).HasColumnName("Payment_Id");
 
-                entity.Property(e => e.OrderId).HasColumnName("OrderID");
+                entity.Property(e => e.Amount).HasColumnType("decimal(18, 0)");
 
-                entity.Property(e => e.PaymentType)
+                entity.Property(e => e.Currency)
+                    .HasMaxLength(3)
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('NGN')");
+
+                entity.Property(e => e.ErrorCodes)
+                    .HasColumnName("Error_Codes")
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('Processing_Error')");
+
+                entity.Property(e => e.IpAddress)
+                    .HasColumnName("Ip_Address")
                     .HasMaxLength(1)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Location)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Message).HasColumnType("text");
+
+                entity.Property(e => e.OrderId).HasColumnName("Order_Id");
+
+                entity.Property(e => e.PaymentType)
+                    .HasColumnName("Payment_Type")
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Receipt).HasColumnType("text");
+
+                entity.Property(e => e.Source)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('Pending')");
+
+                entity.Property(e => e.UserId).HasColumnName("User_Id");
             });
 
             modelBuilder.Entity<Products>(entity =>
