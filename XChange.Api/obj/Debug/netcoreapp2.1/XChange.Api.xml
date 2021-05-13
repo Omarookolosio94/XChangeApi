@@ -239,11 +239,93 @@
         </member>
         <member name="M:XChange.Api.Controllers.CartsController.RemoveProductFromUserCart(System.Int32,System.Int32)">
             <summary>
-            Deletes a user address
+            Removes a product from user's cart
             </summary>
             <returns>Delete success message</returns>
-            <response code="200">Address has been deleted successfully</response>
-            <response code="400">Address does not exist or you are not eligible to carry out this action</response>
+            <response code="200">Product has been removed from cart successfully</response>
+            <response code="400">You do not have this product in your cart or You are not eligible to carry out this action</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.OrdersController.GetOrders">
+            <summary>
+            Get all orders
+            </summary>
+            <returns>List of all orders</returns>
+            <response code="200">List of all orders</response>
+            <response code="400">An error occured, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.OrdersController.GetUserOrders(System.Int32)">
+            <summary>
+            Get all user's orders
+            </summary>
+            <returns>List of all orders by user</returns>
+            <response code="200">List of all orders by user or no order has been placed</response>
+            <response code="400">An error occured, please try again</response>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:XChange.Api.Controllers.OrdersController.GetUserValidOrders(System.Int32)" -->
+        <member name="M:XChange.Api.Controllers.OrdersController.GetSingleUserOrder(System.Int32,System.Int32)">
+            <summary>
+            Get a single user order
+            </summary>
+            <returns>Retrieves single user order</returns>
+            <response code="200">Details of single user order</response>
+            <response code="404">Order not found, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.OrdersController.GetOrdersCount">
+            <summary>
+            Get Count of all orders
+            </summary>
+            <returns>Count of all orderss</returns>
+            <response code="200">Count of all orders</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.OrdersController.GetUserOrdersCount(System.Int32)">
+            <summary>
+            Get Count of all user's orders
+            </summary>
+            <returns>Count of all user's orders</returns>
+            <response code="200">Count of all user's orders</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.OrdersController.GetUserValidOrdersCount(System.Int32)">
+            <summary>
+            Get Count of all user's valid orders
+            </summary>
+            <returns>Count of all user's valid orders</returns>
+            <response code="200">Count of all user's valid orders</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.OrdersController.QueryOrderByOrderStatus(System.String)">
+            <summary>
+            Query all orders using order-status
+            </summary>
+            <remarks>
+            query order using the following parameters
+            
+                    Pending
+                    Processing
+                    Verified
+                    Completed
+                    Cancelled
+                    
+            </remarks>
+            <returns>List of all orders matching query</returns>
+            <response code="200">List of all orders that match query string or no match found</response>
+            <response code="400">Query not valid or an error occured, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.OrdersController.QueryUserOrderByOrderStatus(System.Int32,System.String)">
+            <summary>
+            Query all user's order using order-status
+            </summary>
+            <remarks>
+            query user order using the following parameters
+            
+                    Pending
+                    Processing
+                    Verified
+                    Completed
+                    Cancelled
+                    
+            </remarks>
+            <returns>List of all user's orders matching query</returns>
+            <response code="200">List of all user's orders that match query string or no match found</response>
+            <response code="400">Query not valid or an error occured, please try again</response>
         </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products">
             <summary>

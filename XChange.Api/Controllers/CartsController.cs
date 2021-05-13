@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,7 +10,6 @@ using XChange.Api.Models;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
-using XChange.Data.Services.Concretes;
 
 namespace XChange.Api.Controllers
 {

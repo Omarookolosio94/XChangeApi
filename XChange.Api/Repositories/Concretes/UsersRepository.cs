@@ -11,7 +11,6 @@ using XChange.Api.Models;
 using XChange.Api.Repositories.Interfaces;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
-using XChange.Data.Services.Concretes;
 
 namespace XChange.Api.Repositories.Concretes
 {

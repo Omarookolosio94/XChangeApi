@@ -15,7 +15,6 @@ using XChange.Api.DTO;
 using XChange.Api.Extensions;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
-using XChange.Data.Services.Concretes;
 
 namespace XChange.Api
 {

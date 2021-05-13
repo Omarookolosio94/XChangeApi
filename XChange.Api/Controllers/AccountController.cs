@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +10,6 @@ using XChange.Api.Models;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
-using XChange.Data.Services.Concretes;
 using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers

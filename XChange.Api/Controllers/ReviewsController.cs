@@ -12,7 +12,6 @@ using XChange.Api.Models;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
-using XChange.Data.Services.Concretes;
 using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
