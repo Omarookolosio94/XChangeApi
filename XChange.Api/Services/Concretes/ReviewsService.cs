@@ -94,6 +94,19 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
+        public async Task<int> GetReviewsCount()
+        {
+            try
+            {
+                int count = await _reviewsRepository.GetReviewsCount();
+                return count;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
         public async Task<List<Reviews>> GetReviewsOfProduct(int productId)
         {
             try
@@ -107,35 +120,35 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
-        public async Task<bool> UpdateReview(int userId , string productPreviousRating,  Reviews review)
+        public async Task<int> GetReviewsOfProductCount(int productId)
         {
             try
             {
-                bool result = false;
-                Reviews updateReview = await _reviewsRepository.GetSingleReviewByUser(userId, review.ReviewId);
-
-                if (updateReview != null)
-                {
-                    if (review.Rating.Length > 0)
-                    {
-
-                        var newProductRating = Utility.Utility.CalculateUpdateRating(productPreviousRating , updateReview.Rating , review.Rating);
-                        await _productsService.UpdateProductRatingReview(newProductRating, review.ProductId);
-
-                        updateReview.Rating = review.Rating;
-                    }
-
-                    updateReview.CustomerReview = review.CustomerReview;
-                    updateReview.LastUpdateTime = DateTime.Now;
-
-
-                    result = await _reviewsRepository.UpdateReview(updateReview);
-                }
-
-                return result;
+                int count = await _reviewsRepository.GetReviewsOfProductCount(productId);
+                return count;
             }
             catch (Exception ex)
             {
+                return 0;
+            }
+        }
+
+        public async Task<bool> UpdateReview(Reviews review)
+        {
+            try
+            {
+                var status = await _reviewsRepository.UpdateReview(review);
+
+                if (status)
+                {
+                    await _productsService.UpdateProductRating(Convert.ToInt32(review.Rating), review.ProductId);
+                }
+
+                return status;
+            }
+            catch (Exception ex)
+            {
+                return false;
                 throw;
             }
         }

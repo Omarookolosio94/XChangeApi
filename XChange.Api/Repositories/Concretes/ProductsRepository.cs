@@ -171,5 +171,28 @@ namespace XChange.Api.Repositories.Concretes
                 return 0;
             }
         }
+
+
+        public async Task<bool> IsProduct(int productId)
+        {
+            try
+            {
+                var status = Query().Where(o => o.ProductId == productId).Count();
+
+                if(status > 0)
+                {
+                    return true;
+                }
+
+                return false;
+
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "IsProduct", "Error checking if product Exist: " + ex + "/n");
+                return false;
+            }
+        }
+
     }
 }

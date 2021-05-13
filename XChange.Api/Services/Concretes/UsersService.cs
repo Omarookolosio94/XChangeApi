@@ -8,7 +8,7 @@ using XChange.Api.Models;
 using XChange.Api.Repositories.Interfaces;
 using XChange.Api.Services.Interfaces;
 
-namespace XChange.Data.Services.Concretes
+namespace XChange.Api.Services.Concretes
 {
     public class UsersService : IUsersService
     {

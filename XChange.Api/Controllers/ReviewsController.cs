@@ -12,7 +12,6 @@ using XChange.Api.Models;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
-using XChange.Data.Services.Concretes;
 using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
@@ -35,6 +34,35 @@ namespace XChange.Api.Controllers
             _auditLogService = new AuditLogService(new AuditLogRepository(dbContext));
             _reviewsService = new ReviewsService(new ReviewsRepository(dbContext));
             _productsService = new ProductsService(new ProductsRepository(dbContext));
+        }
+
+
+        /// <summary>
+        /// Get Count of all reviews
+        /// </summary>
+        /// <returns>Count of all reviews</returns>
+        /// <response code="200">Count of all reviews</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("count", Name = "GetReviewsCount")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ReviewsCount()
+        {
+            var count = await _reviewsService.GetReviewsCount();
+            return Ok(count);
+        }
+
+        /// <summary>
+        /// Get Count of all reviews for a given product
+        /// </summary>
+        /// <returns>Count of all reviews for a given product</returns>
+        /// <response code="200">Count of all reviews for a given product</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("count/{productId}", Name = "GetProductReviewsCount")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ProductReviewsCount(int productId)
+        {
+            var count = await _reviewsService.GetReviewsOfProductCount(productId);
+            return Ok(count);
         }
 
         /// <summary>
@@ -287,7 +315,7 @@ namespace XChange.Api.Controllers
 
 
         /// <summary>
-        /// Adds a new product review
+        /// Updates a product review
         /// </summary>
         /// <remarks>
         /// Sample request:
@@ -300,8 +328,8 @@ namespace XChange.Api.Controllers
         ///     }
         ///
         /// </remarks>
-        /// <returns>Added product review success message</returns>
-        /// <response code="201">Return new created review</response>
+        /// <returns>Updated product review success message</returns>
+        /// <response code="201">Return product update success message</response>
         /// <response code="400">Product not found , Pass in required information , please try again</response>
         [HttpPut("{reviewId}", Name = "UpdateReview")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -393,7 +421,7 @@ namespace XChange.Api.Controllers
             checkReview.Rating = review.Rating;
             checkReview.LastUpdateTime = DateTime.Now;
 
-            var result = await _reviewsService.UpdateReview(Convert.ToInt32(userId), checkProduct.Rating, checkReview);
+            var result = await _reviewsService.UpdateReview(checkReview);
 
             if (result)
             {
@@ -401,14 +429,73 @@ namespace XChange.Api.Controllers
                 AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), "Updated review for product: " + checkProduct.ProductId);
                 _auditLogService.AddAuditLog(auditLog);
 
-
                 response = new ApiResponse(200, "Product Review update successful");
                 return Ok(response);
-
             }
             else
             {
                 response = new ApiResponse(400, "adding review failed, please try again");
+                return BadRequest(response);
+            }
+
+        }
+
+        /// <summary>
+        /// Deletes a review
+        /// </summary>
+        /// <returns>Delete success message</returns>
+        /// <response code="200">Product review has been deleted successfully</response>
+        /// <response code="400">Product review does not exist or you are not eligible to carry out this action</response>
+        [HttpDelete("{reviewId}", Name = "DeleteReview")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces("application/json")]
+        [Authorize(Roles = "B")]
+        public async Task<IActionResult> Reviews(int reviewId)
+        {
+            ApiResponse response;
+
+            //Get user Id from token
+            var userId = User.Claims.Where(a => a.Type == ClaimTypes.Name).FirstOrDefault().Value;
+
+            //Get review
+            var checkReview = await _reviewsService.GetReview(reviewId);
+
+            if (checkReview == null)
+            {
+                response = new ApiResponse(400, "Product Review was not found");
+                return BadRequest(response);
+            }
+
+            if (checkReview.UserId != Convert.ToInt32(userId))
+            {
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
+                return BadRequest(response);
+            }
+
+            //product check
+            var checkProduct = await _productsService.GetProduct(checkReview.ProductId);
+
+            if (checkProduct == null)
+            {
+                response = new ApiResponse(400, "Product was not found");
+                return BadRequest(response);
+            }
+
+            var result = await _reviewsService.DeleteReview(Convert.ToInt32(userId), reviewId);
+
+            if (result)
+            {
+                //add audit log
+                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), "Deleted product review: " + reviewId);
+                _auditLogService.AddAuditLog(auditLog);
+
+                response = new ApiResponse(200, "Product review has been deleted successfully");
+                return Ok(response);
+            }
+            else
+            {
+                response = new ApiResponse(400, "You are not eligible to carry out this action");
                 return BadRequest(response);
             }
 

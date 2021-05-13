@@ -8,7 +8,6 @@ using XChange.Api.DTO;
 using XChange.Api.Models;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Interfaces;
-using XChange.Data.Services.Concretes;
 using BC = BCrypt.Net.BCrypt;
 using static XChange.Api.DTO.ModelError;
 using XChange.Api.Services.Concretes;

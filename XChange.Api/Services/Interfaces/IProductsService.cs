@@ -18,5 +18,6 @@ namespace XChange.Api.Services.Interfaces
         Task<int> GetProductsCount();
         Task<bool> UpdateProductRating(int rating, int productId);
         Task<bool> UpdateProductRatingReview(string rating, int productId );
+        Task<bool> IsProduct(int productId);
     }
 }
