@@ -23,6 +23,7 @@ namespace XChange.Api.Controllers
         private readonly ISellersService _sellersService;
         private readonly IAuditLogService _auditLogService;
         private readonly IOrdersService _ordersService;
+        private readonly ICartsService _cartsService;
 
         public OrdersController()
         {
@@ -31,6 +32,7 @@ namespace XChange.Api.Controllers
             _usersService = new UsersService(new UsersRepository(dbContext));
             _auditLogService = new AuditLogService(new AuditLogRepository(dbContext));
             _ordersService = new OrdersService(new OrdersRepository(dbContext));
+            _cartsService = new CartsService(new CartsRepository(dbContext));
         }
 
         /// <summary>
@@ -277,7 +279,7 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
         [AllowAnonymous]
-        public async Task<IActionResult> QueryUserOrderByOrderStatus(int userId ,[FromQuery]string query)
+        public async Task<IActionResult> QueryUserOrderByOrderStatus(int userId, [FromQuery]string query)
         {
             ApiResponse response;
             var queryString = query.ToLower();
@@ -312,9 +314,44 @@ namespace XChange.Api.Controllers
 
         //POST place an order
 
+        /// <summary>
+        /// Make an order
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST api/orders/{userId}
+        ///     
+        ///     {
+        ///         
+        ///     }
+        ///
+        /// </remarks>
+        /// <returns></returns>
+        /// <response code="201"></response>
+        /// <response code="400"></response>
+        /// <response code="404"></response>
+        [HttpPost("{userId}" , Name ="MakeOrder")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces("application/json")]
+        [Authorize(Roles = "B")]
+        public async Task<IActionResult> MakeOrder(int userId)
+        {
+            ApiResponse response;
+
+            //Fetch cart items
+            var cartItems = _cartsService.GetUserCart(userId);
+
+            int total_price = 0;
+            int total_tax = 0;
+            int total_weight = 0;
+
+            return Ok();
+        }
+
         //PUT cancel an order
-
-
 
 
     }

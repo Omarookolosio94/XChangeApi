@@ -12,8 +12,6 @@ namespace XChange.Api.Repositories.Concretes
     {
 
         private static string ModuleName = "CartsRepository";
-        private readonly XChangeDatabaseContext dbGeneralContext = new XChangeDatabaseContext();
-
 
         public CartsRepository(XChangeDatabaseContext dbContext)
         {

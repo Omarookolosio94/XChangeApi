@@ -42,7 +42,7 @@ namespace XChange.Api.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=XChangeDatabase;Integrated Security=True;");
             }
         }
@@ -145,9 +145,16 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.ProductId).HasColumnName("Product_Id");
 
-                entity.Property(e => e.Quantity).HasDefaultValueSql("((1))");
+                entity.Property(e => e.QuantityOrdered)
+                    .HasColumnName("Quantity_Ordered")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UserId).HasColumnName("User_Id");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Carts)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK__Carts__Product_I__03F0984C");
             });
 
             modelBuilder.Entity<CreditCards>(entity =>

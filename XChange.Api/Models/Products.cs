@@ -5,6 +5,11 @@ namespace XChange.Api.Models
 {
     public partial class Products
     {
+        public Products()
+        {
+            Carts = new HashSet<Carts>();
+        }
+
         public int ProductId { get; set; }
         public string Category { get; set; }
         public string ProductName { get; set; }
@@ -19,5 +24,7 @@ namespace XChange.Api.Models
         public DateTime? TimeAdded { get; set; }
         public DateTime? LastUpdateTime { get; set; }
         public int SellerId { get; set; }
+
+        public ICollection<Carts> Carts { get; set; }
     }
 }

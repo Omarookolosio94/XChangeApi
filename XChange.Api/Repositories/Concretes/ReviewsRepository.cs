@@ -12,7 +12,6 @@ namespace XChange.Api.Repositories.Concretes
     {
 
         private static string ModuleName = "ReviewsRepository";
-        private readonly XChangeDatabaseContext dbGeneralContext = new XChangeDatabaseContext();
 
         public ReviewsRepository(XChangeDatabaseContext dbContext)
         {

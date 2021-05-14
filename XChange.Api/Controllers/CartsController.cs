@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using XChange.Api.DTO;
 using XChange.Api.Models;
+using XChange.Api.Provider.Concretes;
+using XChange.Api.Provider.Interfaces;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
@@ -23,6 +25,7 @@ namespace XChange.Api.Controllers
         private readonly ICartsService _cartsService;
         private readonly IProductsService _productsService;
         private readonly IAuditLogService _auditLogService;
+        private readonly ICartsProvider _cartsProvider;
 
 
         public CartsController()
@@ -31,6 +34,7 @@ namespace XChange.Api.Controllers
             _cartsService = new CartsService(new CartsRepository(dbContext));
             _auditLogService = new AuditLogService(new AuditLogRepository(dbContext));
             _productsService = new ProductsService(new ProductsRepository(dbContext));
+            _cartsProvider = new CartsProvider(dbContext);
         }
 
         /// <summary>
@@ -46,7 +50,9 @@ namespace XChange.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetCarts()
         {
-            var result = _cartsService.GetCarts();
+            //var result = _cartsService.GetCarts();
+            var result = _cartsProvider.GetCarts();
+
             ApiResponse response;
 
             if (result.Result != null)
@@ -203,7 +209,7 @@ namespace XChange.Api.Controllers
             {
                 ProductId = productId,
                 UserId = userId,
-                Quantity = quantity
+                QuantityOrdered = quantity
             };
 
 

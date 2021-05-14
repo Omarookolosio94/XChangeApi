@@ -138,12 +138,12 @@ namespace XChange.Api.Services.Concretes
 
                 if (updateCart != null)
                 {
-                    updateCart.Quantity = cart.Quantity;
+                    updateCart.QuantityOrdered = cart.QuantityOrdered;
 
                     result = await _cartsRepository.UpdateUsercart(updateCart);
                 }
-
                 return result;
+
             }
             catch (Exception ex)
             {
