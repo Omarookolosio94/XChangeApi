@@ -195,6 +195,12 @@ namespace XChange.Api.Controllers
                 return BadRequest(response);
             }
 
+            if(quantity < 1)
+            {
+                response = new ApiResponse(400, "Quantity placed on cart should not be less than 1");
+                return BadRequest(response);
+            }
+
             //check if product exits
             var isProduct = await _productsService.IsProduct(productId);
 

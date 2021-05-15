@@ -42,7 +42,7 @@ namespace XChange.Api.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=XChangeDatabase;Integrated Security=True;");
             }
         }
@@ -154,7 +154,7 @@ namespace XChange.Api.Models
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.Carts)
                     .HasForeignKey(d => d.ProductId)
-                    .HasConstraintName("FK__Carts__Product_I__03F0984C");
+                    .HasConstraintName("FK__Carts__Product_I__0E6E26BF");
             });
 
             modelBuilder.Entity<CreditCards>(entity =>
@@ -246,6 +246,10 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.OrderId).HasColumnName("Order_Id");
 
+                entity.Property(e => e.BillingAddress)
+                    .HasColumnName("Billing_Address")
+                    .HasColumnType("text");
+
                 entity.Property(e => e.BillingAddressId).HasColumnName("Billing_Address_Id");
 
                 entity.Property(e => e.BillingPhone)
@@ -271,6 +275,7 @@ namespace XChange.Api.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Currency)
+                    .IsRequired()
                     .HasMaxLength(3)
                     .IsUnicode(false)
                     .HasDefaultValueSql("('NGN')");
@@ -296,6 +301,7 @@ namespace XChange.Api.Models
                     .HasColumnType("datetime");
 
                 entity.Property(e => e.ProductsId)
+                    .IsRequired()
                     .HasColumnName("Products_Id")
                     .HasColumnType("text");
 

@@ -143,15 +143,23 @@ namespace XChange.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces("application/json")]
         [AllowAnonymous]
-        public IActionResult GetAddressOfUser(int userId)
+        public async Task<IActionResult> GetAddressOfUser(int userId)
         {
 
-            var result = _addressService.GetAddressOfUser(userId);
+            var result = await _addressService.GetAddressOfUser(userId);
             ApiResponse response;
 
             if (result != null)
             {
-                return Ok(result.Result);
+                if (result.Count > 0)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    response = new ApiResponse(200, "No address has been saved by user yet");
+                    return Ok(200);
+                }
             }
             else
             {
@@ -213,7 +221,7 @@ namespace XChange.Api.Controllers
         /// <returns>Address created success message</returns>
         /// <response code="200">Success message</response>
         /// <response code="400">Pass in required information</response>
-        [HttpPost(Name ="AddAddress")]
+        [HttpPost(Name = "AddAddress")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
@@ -351,7 +359,7 @@ namespace XChange.Api.Controllers
             if (result)
             {
                 //add audit log
-                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), "Added address: " + newAddress.Street );
+                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), "Added address: " + newAddress.Street);
                 _auditLogService.AddAuditLog(auditLog);
 
                 response = new ApiResponse(200, "Address added successfully");
@@ -386,7 +394,7 @@ namespace XChange.Api.Controllers
         /// <returns>Address update success message</returns>
         /// <response code="200">Success message</response>
         /// <response code="400">Pass in required information or product does not exist or you are not eligible to carry out this action</response>
-        [HttpPut("{addressId}" , Name ="UpdateAddress")]
+        [HttpPut("{addressId}", Name = "UpdateAddress")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
@@ -525,7 +533,7 @@ namespace XChange.Api.Controllers
             if (result)
             {
                 //add audit log
-                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId) , "Updated address: " + updateAddress.Street);
+                AuditLog auditLog = Utility.Utility.AddAuditLog(Convert.ToInt32(userId), "Updated address: " + updateAddress.Street);
                 _auditLogService.AddAuditLog(auditLog);
 
                 response = new ApiResponse(200, "Address updated successfully");

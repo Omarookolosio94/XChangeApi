@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Utilities.Validation;
 using XChange.Api.DTO;
 using XChange.Api.Models;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
+using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
 {
@@ -24,6 +26,7 @@ namespace XChange.Api.Controllers
         private readonly IAuditLogService _auditLogService;
         private readonly IOrdersService _ordersService;
         private readonly ICartsService _cartsService;
+        private readonly IAddressService _addressService;
 
         public OrdersController()
         {
@@ -33,6 +36,7 @@ namespace XChange.Api.Controllers
             _auditLogService = new AuditLogService(new AuditLogRepository(dbContext));
             _ordersService = new OrdersService(new OrdersRepository(dbContext));
             _cartsService = new CartsService(new CartsRepository(dbContext));
+            _addressService = new AddressService(new AddressRepository(dbContext));
         }
 
         /// <summary>
@@ -331,24 +335,178 @@ namespace XChange.Api.Controllers
         /// <response code="201"></response>
         /// <response code="400"></response>
         /// <response code="404"></response>
-        [HttpPost("{userId}" , Name ="MakeOrder")]
+        [HttpPost("{userId}", Name = "MakeOrder")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
         [Authorize(Roles = "B")]
-        public async Task<IActionResult> MakeOrder(int userId)
+        public async Task<IActionResult> MakeOrder(int userId , Order order)
         {
             ApiResponse response;
+            ModelError errors;
+            List<Error> errorList = new List<Error> { };
+            bool dataValid = true;
+            string saved_Address = "";
+            int saved_Address_Id = 0;
 
             //Fetch cart items
-            var cartItems = _cartsService.GetUserCart(userId);
+            var cartItems = await _cartsService.GetUserCart(userId);
+            Reciept reciept = new Reciept { };
 
-            int total_price = 0;
-            int total_tax = 0;
+            decimal total_price = 0;
+            decimal total_tax = 0;
             int total_weight = 0;
 
-            return Ok();
+            foreach (Carts item in cartItems)
+            {
+                //fetch product and calculate price
+                var isProduct = await _productsService.IsProduct(item.ProductId);
+
+                if (isProduct)
+                {
+                    var productPrice = await _productsService.GetProductPrice(item.ProductId);
+                    var price = productPrice * item.QuantityOrdered;
+
+                    OrderedProducts orderedProducts = new OrderedProducts
+                    {
+                        Porduct_Id = item.ProductId,
+                        Quantity_Ordered = item.QuantityOrdered,
+                        Unit_Price = productPrice,
+                        Price = price
+                    };
+
+                    reciept.OrderedProducts.Add(orderedProducts);
+                    total_price = total_price + price;
+                }
+                else
+                {
+                    response = new ApiResponse(400, "Product with productId: " + item.ProductId + " is no longer available in store. Please remove item from cart and proceed with your order.");
+                    return BadRequest(response);
+                }
+            }
+
+            //validate Biiling phone number
+            if (Validation.IsNull(order.Billing_Phone))
+            {
+                Error err = new Error
+                {
+                    modelName = "Billing_Phone",
+                    modelErrorMessgae = "Phone Number is Required",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+            }
+
+            //validate billing phone
+            if (!Validation.IsNull(order.Billing_Phone) && (order.Billing_Phone.Length != 11 || order.Billing_Phone.Length != 13) )
+            {
+                Error err = new Error
+                {
+                    modelName = "Billing_Phone",
+                    modelErrorMessgae = "Phone Number should be 11 or 13 digits",
+                };
+
+                errorList.Add(err);
+                dataValid = false;
+            }
+
+
+
+            if (!order.UseSavedAddress)
+            {
+                //validate Biiling address
+                if (Validation.IsNull(order.Billing_Address))
+                {
+                    Error err = new Error
+                    {
+                        modelName = "Billing_Address",
+                        modelErrorMessgae = "Address is Required",
+                    };
+
+                    errorList.Add(err);
+                    dataValid = false;
+                }
+            } else
+            {
+                var addressList = await _addressService.GetAddressOfUser(userId);
+
+                if (addressList.Count > 0)
+                {
+                    saved_Address = addressList[0].Street + ", " + addressList[0].City + ", " + addressList[0].State;
+                    saved_Address_Id = addressList[0].AddressId;
+
+                } else
+                {
+                    Error err = new Error
+                    {
+                        modelName = "UseSavedAddress",
+                        modelErrorMessgae = "You have no saved address, please input billing address",
+                    };
+
+                    errorList.Add(err);
+                    dataValid = false;
+
+                }
+            }
+         
+
+            if (!dataValid)
+            {
+                errors = new ModelError(400, "Pass in Required Information", errorList);
+                return BadRequest(errors);
+            }
+
+
+            //get user IP address
+            //get shipperId and address
+            var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+            //Build Order
+            Orders makeOrder = new Orders
+            {
+                UserId = userId,
+                BillingAddressId = saved_Address_Id,
+                BillingAddress = order.UseSavedAddress ? saved_Address : order.Billing_Address,
+                BillingPhone = order.Billing_Phone,
+                Currency = "NGN",
+                CreatedAt = DateTime.Now,
+                OrderStatus = "Pending",
+                Summary = order.Summary,
+                Tag = order.Tag,
+                Source = "Web",
+                IpAddress = remoteIpAddress,
+
+                //ShipperId = 0,
+                //ShippingAddressId = 0,
+
+                PaymentStatus = "pending",
+                ProductsId = "",
+                SubtotalPrice = total_price,
+                TotalTax = total_tax,
+                TotalPrice = total_price + total_tax,
+                TotalWeight = total_weight,
+            };
+
+            var result = await _ordersService.MakeOrder(makeOrder);
+
+            if (result)
+            {
+                //generate receipt
+                reciept.Order_Status = "Pending";
+                reciept.Total_Price = total_price + total_tax;
+                reciept.User_Id = userId;
+
+                //response = new ApiResponse(200, "Order has been placed successfully. While your order is been processed , an email has been sent to you to verify this transaction.");
+                return Ok(reciept);
+            }
+            else
+            {
+                response = new ApiResponse(400, "Order failed , please place another");
+                return BadRequest(response);
+            }
+
         }
 
         //PUT cancel an order

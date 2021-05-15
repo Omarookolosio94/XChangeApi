@@ -288,7 +288,6 @@ namespace XChange.Api.Controllers
                 dataValid = false;
             }
 
-
             //validate ProductDescription
             if (Validation.IsNull(product.ProductDescription))
             {
