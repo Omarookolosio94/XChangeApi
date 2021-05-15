@@ -327,7 +327,7 @@
             <response code="200">List of all user's orders that match query string or no match found</response>
             <response code="400">Query not valid or an error occured, please try again</response>
         </member>
-        <member name="M:XChange.Api.Controllers.OrdersController.MakeOrder(System.Int32)">
+        <member name="M:XChange.Api.Controllers.OrdersController.MakeOrder(System.Int32,XChange.Api.DTO.Order)">
              <summary>
              Make an order
              </summary>
@@ -337,14 +337,17 @@
                  POST api/orders/{userId}
                  
                  {
-                     
+                     "Billing_Address": "18 Agadage Avenue ,Ekpan",
+                     "Billing_Phone": "07019068486",
+                     "Summary":"Making purchase",
+                     "Tag":"Bracelets , Chains",
+                     "UseSavedAddress": false
                  }
             
              </remarks>
-             <returns></returns>
-             <response code="201"></response>
-             <response code="400"></response>
-             <response code="404"></response>
+             <returns>Details of receipts</returns>
+             <response code="201">Returns Receipt showing total price and details of all products ordered</response>
+             <response code="400">Product no longer in store or pass in required information or order failed, please try again</response>
         </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products">
             <summary>

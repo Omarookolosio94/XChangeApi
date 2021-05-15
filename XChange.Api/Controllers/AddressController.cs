@@ -158,7 +158,7 @@ namespace XChange.Api.Controllers
                 else
                 {
                     response = new ApiResponse(200, "No address has been saved by user yet");
-                    return Ok(200);
+                    return Ok(response);
                 }
             }
             else

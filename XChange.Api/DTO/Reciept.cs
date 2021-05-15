@@ -7,7 +7,6 @@ namespace XChange.Api.DTO
 {
     public class Reciept
     {
-        public int Order_Id { get; set; }
         public int User_Id { get; set; }
         public string Order_Status { get; set; }
         public decimal Total_Price { get; set; }
@@ -18,8 +17,8 @@ namespace XChange.Api.DTO
 
     public class OrderedProducts
     {
-        public int Porduct_Id { get; set; }
-        //public int Seller_Id { get; set; }
+        public int Product_Id { get; set; }
+        public int Seller_Id { get; set; }
         public decimal Unit_Price { get; set; }
         public int Quantity_Ordered { get; set; }
         public decimal Price { get; set; }

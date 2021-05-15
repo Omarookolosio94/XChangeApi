@@ -327,32 +327,37 @@ namespace XChange.Api.Controllers
         ///     POST api/orders/{userId}
         ///     
         ///     {
-        ///         
+        ///         "Billing_Address": "18 Agadage Avenue ,Ekpan",
+        ///         "Billing_Phone": "07019068486",
+        ///         "Summary":"Making purchase",
+        ///         "Tag":"Bracelets , Chains",
+        ///         "UseSavedAddress": false
         ///     }
         ///
         /// </remarks>
-        /// <returns></returns>
-        /// <response code="201"></response>
-        /// <response code="400"></response>
-        /// <response code="404"></response>
+        /// <returns>Details of receipts</returns>
+        /// <response code="201">Returns Receipt showing total price and details of all products ordered</response>
+        /// <response code="400">Product no longer in store or pass in required information or order failed, please try again</response>
         [HttpPost("{userId}", Name = "MakeOrder")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json")]
         [Authorize(Roles = "B")]
         public async Task<IActionResult> MakeOrder(int userId , Order order)
         {
             ApiResponse response;
             ModelError errors;
+            Reciept reciept = new Reciept {};
+            List<OrderedProducts> orderedProductsList = new List<OrderedProducts> { };
             List<Error> errorList = new List<Error> { };
+
             bool dataValid = true;
             string saved_Address = "";
             int saved_Address_Id = 0;
+            string productsId = "";
 
             //Fetch cart items
             var cartItems = await _cartsService.GetUserCart(userId);
-            Reciept reciept = new Reciept { };
 
             decimal total_price = 0;
             decimal total_tax = 0;
@@ -370,14 +375,15 @@ namespace XChange.Api.Controllers
 
                     OrderedProducts orderedProducts = new OrderedProducts
                     {
-                        Porduct_Id = item.ProductId,
+                        Product_Id = item.ProductId,
                         Quantity_Ordered = item.QuantityOrdered,
                         Unit_Price = productPrice,
                         Price = price
                     };
 
-                    reciept.OrderedProducts.Add(orderedProducts);
+                    orderedProductsList.Add(orderedProducts);
                     total_price = total_price + price;
+                    productsId = productsId + item.ProductId.ToString() + ",";
                 }
                 else
                 {
@@ -400,7 +406,7 @@ namespace XChange.Api.Controllers
             }
 
             //validate billing phone
-            if (!Validation.IsNull(order.Billing_Phone) && (order.Billing_Phone.Length != 11 || order.Billing_Phone.Length != 13) )
+            if (!Validation.IsNull(order.Billing_Phone) && (order.Billing_Phone.Length != 11 && order.Billing_Phone.Length != 13) )
             {
                 Error err = new Error
                 {
@@ -411,7 +417,6 @@ namespace XChange.Api.Controllers
                 errorList.Add(err);
                 dataValid = false;
             }
-
 
 
             if (!order.UseSavedAddress)
@@ -461,7 +466,7 @@ namespace XChange.Api.Controllers
 
             //get user IP address
             //get shipperId and address
-            var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            //var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress;
 
             //Build Order
             Orders makeOrder = new Orders
@@ -476,13 +481,13 @@ namespace XChange.Api.Controllers
                 Summary = order.Summary,
                 Tag = order.Tag,
                 Source = "Web",
-                IpAddress = remoteIpAddress,
+                IpAddress = " ",
 
                 //ShipperId = 0,
                 //ShippingAddressId = 0,
 
                 PaymentStatus = "pending",
-                ProductsId = "",
+                ProductsId = productsId,
                 SubtotalPrice = total_price,
                 TotalTax = total_tax,
                 TotalPrice = total_price + total_tax,
@@ -497,8 +502,12 @@ namespace XChange.Api.Controllers
                 reciept.Order_Status = "Pending";
                 reciept.Total_Price = total_price + total_tax;
                 reciept.User_Id = userId;
+                reciept.OrderedProducts = orderedProductsList;
 
-                //response = new ApiResponse(200, "Order has been placed successfully. While your order is been processed , an email has been sent to you to verify this transaction.");
+                //add audit log
+                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, "Made an order for the following products: " + productsId +  " Total_Price: " + reciept.Total_Price );
+                _auditLogService.AddAuditLog(auditLog);
+
                 return Ok(reciept);
             }
             else
@@ -506,7 +515,6 @@ namespace XChange.Api.Controllers
                 response = new ApiResponse(400, "Order failed , please place another");
                 return BadRequest(response);
             }
-
         }
 
         //PUT cancel an order
@@ -514,3 +522,14 @@ namespace XChange.Api.Controllers
 
     }
 }
+
+
+
+
+//TODO:
+
+// Add order's error log to view errors related to orders
+// Save receipt and send copy to user email for verification
+// get orderId after order has been made
+// save link of receipt in database
+// delete items from cart after order has been placed successfully.
