@@ -7,7 +7,9 @@ namespace XChange.Api.Models
     {
         public int CartId { get; set; }
         public int UserId { get; set; }
+        public int QuantityOrdered { get; set; }
         public int ProductId { get; set; }
-        public int? Quantity { get; set; }
+
+        public Products Product { get; set; }
     }
 }

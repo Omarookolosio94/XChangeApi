@@ -12,9 +12,6 @@ namespace XChange.Api.Repositories.Concretes
     {
 
         private static string ModuleName = "SellersRepository";
-        private readonly XChangeDatabaseContext dbGeneralContext = new XChangeDatabaseContext();
-
-
 
         public SellersRepository(XChangeDatabaseContext dbContext)
         {

@@ -12,8 +12,6 @@ namespace XChange.Api.Repositories.Concretes
     {
 
         private static string ModuleName = "OrdersRepository";
-        private readonly XChangeDatabaseContext dbGeneralContext = new XChangeDatabaseContext();
-
 
         public OrdersRepository(XChangeDatabaseContext dbContext)
         {
@@ -48,7 +46,8 @@ namespace XChange.Api.Repositories.Concretes
             catch (Exception ex)
             {
                 new Logger().LogError(ModuleName, "UpdateOrder", "Error Updating order. Exception error: " + ex + "\n");
-                throw;
+                //throw;
+                return true;
             }
         }
 

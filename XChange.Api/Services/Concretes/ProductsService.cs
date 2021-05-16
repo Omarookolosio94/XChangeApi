@@ -41,7 +41,8 @@ namespace XChange.Api.Services.Concretes
             {
                 var status = await _productsRepository.GetProducts();
                 return status;
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw;
             }
@@ -54,7 +55,8 @@ namespace XChange.Api.Services.Concretes
                 var status = await _productsRepository.GetProductsBySeller(sellerId);
                 return status;
 
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw;
             }
@@ -87,7 +89,27 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
-        public async  Task<bool> UpdateProduct(int sellerId, Products product)
+        public async Task<decimal> GetProductPrice(int productId)
+        {
+
+            try
+            {
+                var status = await _productsRepository.GetProduct(productId);
+
+                if (status != null)
+                {
+                    return status.UnitPrice;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<bool> UpdateProduct(int sellerId, Products product)
         {
             try
             {
@@ -123,7 +145,7 @@ namespace XChange.Api.Services.Concretes
         {
             try
             {
-                var status = await _productsRepository.DeleteProduct(sellerId ,productId);
+                var status = await _productsRepository.DeleteProduct(sellerId, productId);
                 return status;
             }
             catch (Exception ex)

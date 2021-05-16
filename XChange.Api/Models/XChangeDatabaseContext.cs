@@ -25,6 +25,7 @@ namespace XChange.Api.Models
         public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<Offers> Offers { get; set; }
         public virtual DbSet<Orders> Orders { get; set; }
+        public virtual DbSet<OrdersLog> OrdersLog { get; set; }
         public virtual DbSet<OtpLog> OtpLog { get; set; }
         public virtual DbSet<Payments> Payments { get; set; }
         public virtual DbSet<Products> Products { get; set; }
@@ -145,9 +146,16 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.ProductId).HasColumnName("Product_Id");
 
-                entity.Property(e => e.Quantity).HasDefaultValueSql("((1))");
+                entity.Property(e => e.QuantityOrdered)
+                    .HasColumnName("Quantity_Ordered")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UserId).HasColumnName("User_Id");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Carts)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK__Carts__Product_I__0E6E26BF");
             });
 
             modelBuilder.Entity<CreditCards>(entity =>
@@ -239,6 +247,10 @@ namespace XChange.Api.Models
 
                 entity.Property(e => e.OrderId).HasColumnName("Order_Id");
 
+                entity.Property(e => e.BillingAddress)
+                    .HasColumnName("Billing_Address")
+                    .HasColumnType("text");
+
                 entity.Property(e => e.BillingAddressId).HasColumnName("Billing_Address_Id");
 
                 entity.Property(e => e.BillingPhone)
@@ -264,6 +276,7 @@ namespace XChange.Api.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Currency)
+                    .IsRequired()
                     .HasMaxLength(3)
                     .IsUnicode(false)
                     .HasDefaultValueSql("('NGN')");
@@ -272,6 +285,14 @@ namespace XChange.Api.Models
                     .HasColumnName("Ip_Address")
                     .HasMaxLength(1)
                     .IsUnicode(false);
+
+                entity.Property(e => e.OrderReceiptName)
+                    .HasColumnName("Order_Receipt_Name")
+                    .HasColumnType("text");
+
+                entity.Property(e => e.OrderRecieptUrl)
+                    .HasColumnName("Order_Reciept_Url")
+                    .HasColumnType("text");
 
                 entity.Property(e => e.OrderStatus)
                     .HasColumnName("Order_Status")
@@ -289,6 +310,7 @@ namespace XChange.Api.Models
                     .HasColumnType("datetime");
 
                 entity.Property(e => e.ProductsId)
+                    .IsRequired()
                     .HasColumnName("Products_Id")
                     .HasColumnType("text");
 
@@ -320,6 +342,23 @@ namespace XChange.Api.Models
                 entity.Property(e => e.TotalWeight).HasColumnName("Total_Weight");
 
                 entity.Property(e => e.UserId).HasColumnName("User_Id");
+            });
+
+            modelBuilder.Entity<OrdersLog>(entity =>
+            {
+                entity.Property(e => e.OrdersLogId).HasColumnName("Orders_Log_Id");
+
+                entity.Property(e => e.Activity).HasColumnType("text");
+
+                entity.Property(e => e.Error).HasColumnType("text");
+
+                entity.Property(e => e.IsSuccessful).HasColumnName("isSuccessful");
+
+                entity.Property(e => e.Receipt).HasColumnType("text");
+
+                entity.Property(e => e.TimeLogged)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
             });
 
             modelBuilder.Entity<OtpLog>(entity =>

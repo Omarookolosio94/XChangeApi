@@ -67,7 +67,7 @@ namespace XChange.Api.Repositories.Concretes
         {
             try
             {
-                RefreshToken refreshToken = Query().Where(o => o.UserId == userId && o.Token == token).FirstOrDefault();
+                RefreshToken refreshToken = Query().Where(o => o.UserId == userId && o.Token.ToLower() == token.ToLower()).FirstOrDefault();
 
                 if (refreshToken != null)
                 {

@@ -27,15 +27,25 @@ namespace XChange.Api.Services.Concretes
             Send(emailMessage);
         }
 
-        private MimeMessage CreateEmailMessage(Message message)
+        public void SendEmailWithPDF(Message message , string fileName)
+        {
+            var emailMessage = CreateEmailMessage(message , fileName);
+            Send(emailMessage);
+        }
+
+
+        public async Task SendEmailAsync(Message message)
+        {
+            var mailMessage = CreateEmailMessage(message);
+            await SendAsync(mailMessage);
+        }
+
+        private MimeMessage CreateEmailMessage(Message message , string fileName = "")
         {
             var emailMessage = new MimeMessage();
-            //emailMessage.From.Add(new MailboxAddress(_emailConfiguration.From));
             emailMessage.From.Add(MailboxAddress.Parse(_emailConfiguration.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-            //emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
-            //emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = string.Format("<h2 style='color:red;'>{0}</h2>", message.Content) };
 
             string FilePath = Directory.GetCurrentDirectory() + "\\Utility\\WelcomeEmailTemplate.html";
             StreamReader str = new StreamReader(FilePath);
@@ -45,6 +55,13 @@ namespace XChange.Api.Services.Concretes
             MailText = MailText.Replace("[content]" , message.Content).Replace("[heading]", message.Subject); ;
 
             var builder = new BodyBuilder();
+
+            if (message.Attachments != null)
+            {
+                var stream = new MemoryStream(message.Attachments);
+                builder.Attachments.Add(fileName, stream , ContentType.Parse("application/pdf"));
+            }
+
             builder.HtmlBody = MailText;
             emailMessage.Body = builder.ToMessageBody();
 
@@ -76,5 +93,30 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
+
+        private async Task SendAsync(MimeMessage mailMessage)
+        {
+            using (var client = new SmtpClient())
+            {
+                try
+                {
+                    await client.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.Port, true);
+                    client.AuthenticationMechanisms.Remove("XOAUTH2");
+                    await client.AuthenticateAsync(_emailConfiguration.UserName, _emailConfiguration.Password);
+
+                    await client.SendAsync(mailMessage);
+                }
+                catch
+                {
+                    new Logger().LogError(ModuleName, "Send Email Async", "Error  sending email async" + "\n");
+                    return;
+                }
+                finally
+                {
+                    await client.DisconnectAsync(true);
+                    client.Dispose();
+                }
+            }
+        }
     }
 }

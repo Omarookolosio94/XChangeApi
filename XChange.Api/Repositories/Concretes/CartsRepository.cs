@@ -12,8 +12,6 @@ namespace XChange.Api.Repositories.Concretes
     {
 
         private static string ModuleName = "CartsRepository";
-        private readonly XChangeDatabaseContext dbGeneralContext = new XChangeDatabaseContext();
-
 
         public CartsRepository(XChangeDatabaseContext dbContext)
         {
@@ -183,6 +181,30 @@ namespace XChange.Api.Repositories.Concretes
             catch (Exception ex)
             {
                 new Logger().LogError(ModuleName, "GetSingleProductInCart", "Error getting product from cart: " + ex + "/n");
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteCarts(List<int> cartIds)
+        {
+            try
+            {
+                List<Carts> cartItems = new List<Carts> { };
+                foreach (int id in cartIds)
+                {
+                    var cartItem = Query().Where(o => o.CartId == id).FirstOrDefault();
+                    cartItems.Add(cartItem);
+                }
+
+                DeleteRange(cartItems);
+                await Commit();
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "Delete Carts", "Error Deleting CartItems" + ex + "\n");
                 throw;
             }
         }

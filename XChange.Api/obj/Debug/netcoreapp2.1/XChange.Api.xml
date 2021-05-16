@@ -261,7 +261,14 @@
             <response code="200">List of all orders by user or no order has been placed</response>
             <response code="400">An error occured, please try again</response>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:XChange.Api.Controllers.OrdersController.GetUserValidOrders(System.Int32)" -->
+        <member name="M:XChange.Api.Controllers.OrdersController.GetUserValidOrders(System.Int32)">
+            <summary>
+            Get all user's valid orders
+            </summary>
+            <returns>List of all valid or active orders by user</returns>
+            <response code="200">List of all valid orders by user or all order has been close</response>
+            <response code="400">An error occured, please try again</response>
+        </member>
         <member name="M:XChange.Api.Controllers.OrdersController.GetSingleUserOrder(System.Int32,System.Int32)">
             <summary>
             Get a single user order
@@ -326,6 +333,28 @@
             <returns>List of all user's orders matching query</returns>
             <response code="200">List of all user's orders that match query string or no match found</response>
             <response code="400">Query not valid or an error occured, please try again</response>
+        </member>
+        <member name="M:XChange.Api.Controllers.OrdersController.MakeOrder(System.Int32,XChange.Api.DTO.Order)">
+             <summary>
+             Make an order
+             </summary>
+             <remarks>
+             Sample request:
+            
+                 POST api/orders/{userId}
+                 
+                 {
+                     "Billing_Address": "18 Agadage Avenue ,Ekpan",
+                     "Billing_Phone": "07019068486",
+                     "Summary":"Making purchase",
+                     "Tag":"Bracelets , Chains",
+                     "UseSavedAddress": false
+                 }
+            
+             </remarks>
+             <returns>Details of receipts</returns>
+             <response code="201">Returns Receipt showing total price and details of all products ordered</response>
+             <response code="400">No item in cart or Product no longer in store or pass in required information or order failed, please try again</response>
         </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products">
             <summary>

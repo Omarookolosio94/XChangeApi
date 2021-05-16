@@ -13,8 +13,9 @@ namespace XChange.Api.Repositories.Interfaces
         Task<List<Carts>> GetUserCart(int userId);
         Task<bool> DeleteUserCart(int userId);
         Task<List<Carts>> GetCarts();
-        Task<bool> IsProductInUserCart(int productId , int userId);
+        Task<bool> IsProductInUserCart(int productId, int userId);
         Task<Carts> GetSingleProductInCart(int productId, int userId);
         Task<bool> UpdateUsercart(Carts cart);
+        Task<bool> DeleteCarts(List<int> cartIds);
     }
 }

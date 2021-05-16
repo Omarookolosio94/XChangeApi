@@ -16,5 +16,7 @@ namespace XChange.Api.Services.Interfaces
         Task<bool> UpdateUserCart(int userId, Carts cart);
         Task<bool> IsProductInUserCart(int productId , int userId);
         Task<Carts> GetSingleProductInCart(int productId, int userId);
+        Task<bool> DeleteCarts(List<int> cartIds);
+
     }
 }
