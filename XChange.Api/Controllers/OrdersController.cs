@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DinkToPdf.Contracts;
@@ -32,9 +33,12 @@ namespace XChange.Api.Controllers
         private readonly ICartsService _cartsService;
         private readonly IAddressService _addressService;
         private readonly IConverter _converter;
+        public readonly IEmailService _emailService;
+        private readonly IGoogleCloudStorageService _googleCloudStorageService;
 
 
-        public OrdersController(IConverter converter)
+
+        public OrdersController(IConverter converter , IGoogleCloudStorageService googleCloudStorageService , IEmailService emailService)
         {
             _productsService = new ProductsService(new ProductsRepository(dbContext));
             _sellersService = new SellersService(new SellersRepository(dbContext));
@@ -44,6 +48,9 @@ namespace XChange.Api.Controllers
             _cartsService = new CartsService(new CartsRepository(dbContext));
             _addressService = new AddressService(new AddressRepository(dbContext));
             _converter = converter;
+            _emailService = emailService;
+            _googleCloudStorageService = googleCloudStorageService;
+
         }
 
         /// <summary>
@@ -376,14 +383,15 @@ namespace XChange.Api.Controllers
 
                 if (isProduct)
                 {
-                    var productPrice = await _productsService.GetProductPrice(item.ProductId);
-                    var price = productPrice * item.QuantityOrdered;
+                    var product = await _productsService.GetProduct(item.ProductId);
+                    var price = product.UnitPrice * item.QuantityOrdered;
 
                     OrderedProducts orderedProducts = new OrderedProducts
                     {
                         Product_Id = item.ProductId,
+                        Product_Name = product.ProductName,
                         Quantity_Ordered = item.QuantityOrdered,
-                        Unit_Price = productPrice,
+                        Unit_Price = product.UnitPrice,
                         Price = price
                     };
 
@@ -519,8 +527,13 @@ namespace XChange.Api.Controllers
                 var receiptHTMLTemplate = PDF_Template_Generator.Get_Orders_Receipt_HTML_Template(reciept);
 
                 var pdfFile = PDF_Utility.Create_Order_PDF(makeOrder.OrderId, userId, receiptHTMLTemplate);
-                _converter.Convert(pdfFile);
+                var convertFile = _converter.Convert(pdfFile);
+                var fileName = "Order_Receipt_" + makeOrder.OrderId+"_" + userId + "_" + DateTime.Now.ToString("ddMMMMyyyyHHmm") + ".pdf";
+                var email = User.Claims.Where(a => a.Type == ClaimTypes.Email).FirstOrDefault().Value;
 
+                Message message;
+                message = new Message(new string[] { email }, "Order Placed", "Please, review reciept before order confirmation." , convertFile);
+                _emailService.SendEmailWithPDF(message , fileName);
 
                 //add audit log
                 AuditLog auditLog = Utility.Utility.AddAuditLog(userId, "Made an order for the following products: " + productsId +  " Total_Price: " + reciept.Total_Price + " Order_Id: " + makeOrder.OrderId + "Reciept: " + JsonSerializer.Serialize(reciept));
@@ -536,8 +549,6 @@ namespace XChange.Api.Controllers
         }
 
         //PUT cancel an order
-
-
     }
 }
 

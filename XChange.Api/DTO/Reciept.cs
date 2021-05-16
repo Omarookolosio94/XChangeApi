@@ -22,6 +22,7 @@ namespace XChange.Api.DTO
     public class OrderedProducts
     {
         public int Product_Id { get; set; }
+        public string Product_Name { get; set; }
         public int Seller_Id { get; set; }
         public decimal Unit_Price { get; set; }
         public int Quantity_Ordered { get; set; }

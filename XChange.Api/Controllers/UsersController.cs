@@ -639,7 +639,8 @@ namespace XChange.Api.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                             new Claim(ClaimTypes.Name , Convert.ToString(user.UserId)),
-                            new Claim(ClaimTypes.Role, user.UserType)
+                            new Claim(ClaimTypes.Role, user.UserType),
+                            new Claim(ClaimTypes.Email , user.Email)
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),

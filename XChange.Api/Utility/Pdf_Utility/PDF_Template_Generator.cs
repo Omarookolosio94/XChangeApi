@@ -62,7 +62,7 @@ namespace XChange.Api.Utility
                                     <td class='tableitem'><p class='itemtext'>{3}</p></td>
                                 </tr>
 
-                ", order.Product_Id , order.Unit_Price , order.Quantity_Ordered , order.Price);
+                ", order.Product_Name , order.Unit_Price , order.Quantity_Ordered , order.Price);
             }
 
             sb.AppendFormat(@"
@@ -77,7 +77,7 @@ namespace XChange.Api.Utility
                                                     <td></td>
                                                     <td></td>
                                                     <td class='Rate'><h2>Total</h2></td>
-                                                    <td class='payment'><h2>{1}</h2></td>
+                                                    <td class='payment'><h2>NGN {1}</h2></td>
                                                 </tr>
                  
                                             </table>

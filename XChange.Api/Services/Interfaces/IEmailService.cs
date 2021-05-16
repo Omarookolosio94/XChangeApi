@@ -9,5 +9,7 @@ namespace XChange.Api.Services.Interfaces
     public interface IEmailService
     {
         void SendEmail(Message message);
+        void SendEmailWithPDF(Message message , string pdfFileName);
+        Task SendEmailAsync(Message message);
     }
 }
