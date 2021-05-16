@@ -350,7 +350,7 @@ namespace XChange.Api.Controllers
         /// </remarks>
         /// <returns>Details of receipts</returns>
         /// <response code="201">Returns Receipt showing total price and details of all products ordered</response>
-        /// <response code="400">Product no longer in store or pass in required information or order failed, please try again</response>
+        /// <response code="400">No item in cart or Product no longer in store or pass in required information or order failed, please try again</response>
         [HttpPost("{userId}", Name = "MakeOrder")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -360,21 +360,28 @@ namespace XChange.Api.Controllers
         {
             ApiResponse response;
             ModelError errors;
+            List<int> cartIds = new List<int> { };
             Reciept reciept = new Reciept {};
-            List<OrderedProducts> orderedProductsList = new List<OrderedProducts> { };
             List<Error> errorList = new List<Error> { };
+            List<OrderedProducts> orderedProductsList = new List<OrderedProducts> { };
 
             bool dataValid = true;
             string saved_Address = "";
             int saved_Address_Id = 0;
             string productsId = "";
+            decimal total_price = 0;
+            decimal total_tax = 0;
+            int total_weight = 0;
 
             //Fetch cart items
             var cartItems = await _cartsService.GetUserCart(userId);
 
-            decimal total_price = 0;
-            decimal total_tax = 0;
-            int total_weight = 0;
+            if(cartItems.Count < 1)
+            {
+                response = new ApiResponse(400, "You have no item in cart. Please, place item in cart before proceeding to order.");
+                return BadRequest(response);
+            }
+
 
             foreach (Carts item in cartItems)
             {
@@ -395,6 +402,7 @@ namespace XChange.Api.Controllers
                         Price = price
                     };
 
+                    cartIds.Add(item.CartId);
                     orderedProductsList.Add(orderedProducts);
                     total_price = total_price + price;
                     productsId = productsId + item.ProductId.ToString() + ",";
@@ -535,9 +543,22 @@ namespace XChange.Api.Controllers
                 message = new Message(new string[] { email }, "Order Placed", "Please, review reciept before order confirmation." , convertFile);
                 _emailService.SendEmailWithPDF(message , fileName);
 
+                //upload file to google cloud
+                var pdfUrl = await _googleCloudStorageService.UploadPDFAsync(convertFile, fileName);
+
+                //update receipt url
+                makeOrder.OrderRecieptUrl = pdfUrl;
+                makeOrder.OrderReceiptName = fileName;
+
+                _ordersService.UpdateReceiptUrl(makeOrder);
+
+
                 //add audit log
                 AuditLog auditLog = Utility.Utility.AddAuditLog(userId, "Made an order for the following products: " + productsId +  " Total_Price: " + reciept.Total_Price + " Order_Id: " + makeOrder.OrderId + "Reciept: " + JsonSerializer.Serialize(reciept));
                 _auditLogService.AddAuditLog(auditLog);
+
+                //delete item from carts
+                _cartsService.DeleteCarts(cartIds);
 
                 return Ok(reciept);
             }
@@ -549,6 +570,7 @@ namespace XChange.Api.Controllers
         }
 
         //PUT cancel an order
+        //on cancel send email to buyer and supplier
     }
 }
 
@@ -556,6 +578,3 @@ namespace XChange.Api.Controllers
 //TODO:
 
 // Add order's error log to view errors related to orders
-// Save receipt and send copy to user email for verification
-// save link of receipt in database
-// delete items from cart after order has been placed successfully.

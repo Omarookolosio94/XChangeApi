@@ -164,5 +164,19 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
+        public async Task<bool> DeleteCarts(List<int> cartIds)
+        {
+            try
+            {
+                var status = await _cartsRepository.DeleteCarts(cartIds);
+                return status;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+
     }
 }

@@ -34,6 +34,13 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
+        public async Task<string> UploadPDFAsync(byte[] file, string fileName)
+        {
+            var stream = new MemoryStream(file);
+            var dataObject = await storageClient.UploadObjectAsync(bucketName, fileName, null, stream);
+            return dataObject.MediaLink;
+        }
+
         public async Task DeleteFileAsync(string fileName)
         {
             await storageClient.DeleteObjectAsync(bucketName, fileName);

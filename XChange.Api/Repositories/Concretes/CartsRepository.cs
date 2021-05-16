@@ -184,5 +184,29 @@ namespace XChange.Api.Repositories.Concretes
                 throw;
             }
         }
+
+        public async Task<bool> DeleteCarts(List<int> cartIds)
+        {
+            try
+            {
+                List<Carts> cartItems = new List<Carts> { };
+                foreach (int id in cartIds)
+                {
+                    var cartItem = Query().Where(o => o.CartId == id).FirstOrDefault();
+                    cartItems.Add(cartItem);
+                }
+
+                DeleteRange(cartItems);
+                await Commit();
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError(ModuleName, "Delete Carts", "Error Deleting CartItems" + ex + "\n");
+                throw;
+            }
+        }
     }
 }

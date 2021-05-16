@@ -18,7 +18,7 @@ namespace XChange.Api.Services.Concretes
             _ordersRepository = ordersRepository;
 
         }
- 
+
         public async Task<bool> MakeOrder(Orders order)
         {
             try
@@ -161,7 +161,7 @@ namespace XChange.Api.Services.Concretes
             }
         }
 
-        public async Task<bool> CancelOrder(int orderId, int userId , string reason)
+        public async Task<bool> CancelOrder(int orderId, int userId, string reason)
         {
             try
             {
@@ -228,12 +228,49 @@ namespace XChange.Api.Services.Concretes
         {
             try
             {
-                var status = await _ordersRepository.IsUserOrder(userid , orderId);
+                var status = await _ordersRepository.IsUserOrder(userid, orderId);
                 return status;
             }
             catch (Exception ex)
             {
                 return false;
+            }
+        }
+
+        public async Task<bool> UpdateOrderReceiptUrl(int orderId, string receiptUrl , string receiptName)
+        {
+            try
+            {
+                bool result = true;
+                Orders updateOrder = await _ordersRepository.GetOrder(orderId);
+
+                if (updateOrder != null)
+                {
+                    updateOrder.OrderRecieptUrl = receiptUrl;
+                    updateOrder.OrderReceiptName = receiptName;
+
+                    result = await _ordersRepository.UpdateOrder(updateOrder);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError("OrdersService", "UpdateOrderReceiptUrl", "Error Updating order receipt Url. Exception error: " + ex + "\n");
+                return true;
+            }
+        }
+
+        public async Task<bool> UpdateReceiptUrl(Orders order)
+        {
+            try
+            {
+                 return await _ordersRepository.UpdateOrder(order);
+            }
+            catch (Exception ex)
+            {
+                new Logger().LogError("OrdersService", "UpdateReceiptUrl", "Error Updating order receipt Url. Exception error: " + ex + "\n");
+                return true;
             }
         }
     }

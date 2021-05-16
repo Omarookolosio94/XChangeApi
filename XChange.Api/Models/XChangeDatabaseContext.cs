@@ -286,6 +286,14 @@ namespace XChange.Api.Models
                     .HasMaxLength(1)
                     .IsUnicode(false);
 
+                entity.Property(e => e.OrderReceiptName)
+                    .HasColumnName("Order_Receipt_Name")
+                    .HasColumnType("text");
+
+                entity.Property(e => e.OrderRecieptUrl)
+                    .HasColumnName("Order_Reciept_Url")
+                    .HasColumnType("text");
+
                 entity.Property(e => e.OrderStatus)
                     .HasColumnName("Order_Status")
                     .HasMaxLength(50)

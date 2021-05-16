@@ -44,7 +44,8 @@ namespace XChange.Api.Utility
                                     <div id='table'>
                                         <table>
                                             <tr class='tabletitle'>
-                                                <td class='item'><h2>Item</h2></td>
+                                                <td class='item'><h2>Product</h2></td>
+                                                <td class='Hours'><h2>Product Id</h2></td>
                                                 <td class='Hours'><h2>Unit Price</h2></td>
                                                 <td class='Hours'><h2>Quantity</h2></td>
                                                 <td class='Rate'><h2>Sub Total</h2></td>
@@ -60,13 +61,15 @@ namespace XChange.Api.Utility
                                     <td class='tableitem'><p class='itemtext'>{1}</p></td>
                                     <td class='tableitem'><p class='itemtext'>{2}</p></td>
                                     <td class='tableitem'><p class='itemtext'>{3}</p></td>
+                                    <td class='tableitem'><p class='itemtext'>{4}</p></td>
                                 </tr>
 
-                ", order.Product_Name , order.Unit_Price , order.Quantity_Ordered , order.Price);
+                ", order.Product_Name , order.Product_Id , order.Unit_Price , order.Quantity_Ordered , order.Price);
             }
 
             sb.AppendFormat(@"
                                                 <tr class='tabletitle'>
+                                                    <td></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td class='Rate'><h2>Tax</h2></td>
@@ -74,6 +77,7 @@ namespace XChange.Api.Utility
                                                 </tr>
     
                                                 <tr class='tabletitle'>
+                                                    <td></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td class='Rate'><h2>Total</h2></td>

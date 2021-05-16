@@ -29,5 +29,7 @@ namespace XChange.Api.Models
         public DateTime? ProcessedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
         public DateTime? CancelledAt { get; set; }
+        public string OrderRecieptUrl { get; set; }
+        public string OrderReceiptName { get; set; }
     }
 }

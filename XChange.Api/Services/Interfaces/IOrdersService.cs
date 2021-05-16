@@ -20,6 +20,8 @@ namespace XChange.Api.Services.Interfaces
         Task<bool> IsOrderValid(int orderId);
         Task<bool> IsUserOrder(int userid, int orderId);
         Task<bool> CancelOrder(int orderId, int userId , string reason);
+        Task<bool> UpdateOrderReceiptUrl(int orderId, string receiptUrl ,string receiptName);
+        Task<bool> UpdateReceiptUrl(Orders order);
         //Task<bool> CloseOrder(int orderId , int userId);
         //Task<bool> OpenOrder(int orderId);
     }

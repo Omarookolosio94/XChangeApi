@@ -46,7 +46,8 @@ namespace XChange.Api.Repositories.Concretes
             catch (Exception ex)
             {
                 new Logger().LogError(ModuleName, "UpdateOrder", "Error Updating order. Exception error: " + ex + "\n");
-                throw;
+                //throw;
+                return true;
             }
         }
 

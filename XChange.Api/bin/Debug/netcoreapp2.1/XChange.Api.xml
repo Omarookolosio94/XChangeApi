@@ -354,7 +354,7 @@
              </remarks>
              <returns>Details of receipts</returns>
              <response code="201">Returns Receipt showing total price and details of all products ordered</response>
-             <response code="400">Product no longer in store or pass in required information or order failed, please try again</response>
+             <response code="400">No item in cart or Product no longer in store or pass in required information or order failed, please try again</response>
         </member>
         <member name="M:XChange.Api.Controllers.ProductsController.Products">
             <summary>
