@@ -506,13 +506,14 @@ namespace XChange.Api.Controllers
             {
                 //generate receipt
                 reciept.Order_Id = makeOrder.OrderId;
-                reciept.Order_Status = "Pending";
+                reciept.Order_Status = makeOrder.OrderStatus;
+                reciept.Payment_Status = makeOrder.PaymentStatus;
                 reciept.Total_Price = total_price + total_tax;
                 reciept.User_Id = userId;
                 reciept.OrderedProducts = orderedProductsList;
                 reciept.Billing_Address = makeOrder.BillingAddress;
                 reciept.Billing_Phone = makeOrder.BillingPhone;
-
+                
 
                 //generate receipt pdf
                 var receiptHTMLTemplate = PDF_Template_Generator.Get_Orders_Receipt_HTML_Template(reciept);

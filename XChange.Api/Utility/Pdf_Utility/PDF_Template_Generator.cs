@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using XChange.Api.DTO;
 
@@ -9,7 +10,7 @@ namespace XChange.Api.Utility
         public static string Get_Orders_Receipt_HTML_Template(Reciept reciept)
         {
             var sb = new StringBuilder();
-            sb.Append(@"
+            sb.AppendFormat(@"
                         <html>
                             <head>
                             </head>
@@ -19,17 +20,21 @@ namespace XChange.Api.Utility
                                       <div class='logo'></div>
                                       <div class='info'> 
                                          <h2>XChange ECommerce</h2>
+                                         <p>Receipt for Order_{0}_{1}_{2}</p>
                                      </div>
                                  </center>
-            ");
+            ", reciept.Order_Id, reciept.User_Id , DateTime.Now.ToString("ddMMMMyyyyHHmm"));
 
             sb.AppendFormat(@"
                                 <div id='mid'>
                                      <div class='info'>
                                            <h2>Contact Info</h2>
                                             <p> 
-                                                Billing Address : {0}</br>
-                                                Billing Phone Number: {1}</br>
+                                                Order Date: {0}</br>
+                                                Order Status: {1}</br>
+                                                Order Payment Status: {2}</br>
+                                                Billing Address : {3}</br>
+                                                Billing Phone Number: {4}</br>
                                             </p>
                                       </div>
                                     </div>
@@ -44,7 +49,7 @@ namespace XChange.Api.Utility
                                                 <td class='Hours'><h2>Quantity</h2></td>
                                                 <td class='Rate'><h2>Sub Total</h2></td>
                                             </tr>
-            ", reciept.Billing_Address , reciept.Billing_Phone);
+            ", DateTime.Now, reciept.Order_Status , reciept.Payment_Status, reciept.Billing_Address , reciept.Billing_Phone);
 
 
             foreach (var order in reciept.OrderedProducts)

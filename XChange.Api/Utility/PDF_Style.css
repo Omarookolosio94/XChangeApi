@@ -90,6 +90,10 @@
         border-collapse: collapse;
     }
 
+    #invoice-POS .tableitem {
+        padding: 8px 0;
+    }
+
     #invoice-POS .tabletitle {
         font-size: 14px;
         background: #eee;
