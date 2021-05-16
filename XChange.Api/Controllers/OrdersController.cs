@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +13,8 @@ using XChange.Api.Models;
 using XChange.Api.Repositories.Concretes;
 using XChange.Api.Services.Concretes;
 using XChange.Api.Services.Interfaces;
+using XChange.Api.Utility;
+using XChange.Api.Utility.Pdf_Utility;
 using static XChange.Api.DTO.ModelError;
 
 namespace XChange.Api.Controllers
@@ -27,8 +31,10 @@ namespace XChange.Api.Controllers
         private readonly IOrdersService _ordersService;
         private readonly ICartsService _cartsService;
         private readonly IAddressService _addressService;
+        private readonly IConverter _converter;
 
-        public OrdersController()
+
+        public OrdersController(IConverter converter)
         {
             _productsService = new ProductsService(new ProductsRepository(dbContext));
             _sellersService = new SellersService(new SellersRepository(dbContext));
@@ -37,6 +43,7 @@ namespace XChange.Api.Controllers
             _ordersService = new OrdersService(new OrdersRepository(dbContext));
             _cartsService = new CartsService(new CartsRepository(dbContext));
             _addressService = new AddressService(new AddressRepository(dbContext));
+            _converter = converter;
         }
 
         /// <summary>
@@ -105,7 +112,7 @@ namespace XChange.Api.Controllers
         /// Get all user's valid orders
         /// </summary>
         /// <returns>List of all valid or active orders by user</returns>
-        /// <response code="200">List of all valid orders by user or all order has been closed/response>
+        /// <response code="200">List of all valid orders by user or all order has been close</response>
         /// <response code="400">An error occured, please try again</response>
         [HttpGet("{userId}/valid-orders", Name = "GetUserValidOrders")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -316,7 +323,6 @@ namespace XChange.Api.Controllers
         }
 
 
-        //POST place an order
 
         /// <summary>
         /// Make an order
@@ -499,13 +505,24 @@ namespace XChange.Api.Controllers
             if (result)
             {
                 //generate receipt
+                reciept.Order_Id = makeOrder.OrderId;
                 reciept.Order_Status = "Pending";
                 reciept.Total_Price = total_price + total_tax;
                 reciept.User_Id = userId;
                 reciept.OrderedProducts = orderedProductsList;
+                reciept.Billing_Address = makeOrder.BillingAddress;
+                reciept.Billing_Phone = makeOrder.BillingPhone;
+
+
+                //generate receipt pdf
+                var receiptHTMLTemplate = PDF_Template_Generator.Get_Orders_Receipt_HTML_Template(reciept);
+
+                var pdfFile = PDF_Utility.Create_Order_PDF(makeOrder.OrderId, userId, receiptHTMLTemplate);
+                _converter.Convert(pdfFile);
+
 
                 //add audit log
-                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, "Made an order for the following products: " + productsId +  " Total_Price: " + reciept.Total_Price );
+                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, "Made an order for the following products: " + productsId +  " Total_Price: " + reciept.Total_Price + " Order_Id: " + makeOrder.OrderId + "Reciept: " + JsonSerializer.Serialize(reciept));
                 _auditLogService.AddAuditLog(auditLog);
 
                 return Ok(reciept);
@@ -524,12 +541,9 @@ namespace XChange.Api.Controllers
 }
 
 
-
-
 //TODO:
 
 // Add order's error log to view errors related to orders
 // Save receipt and send copy to user email for verification
-// get orderId after order has been made
 // save link of receipt in database
 // delete items from cart after order has been placed successfully.

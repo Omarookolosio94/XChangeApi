@@ -16,3 +16,10 @@ Add validation for images:
 
 
 Safely manage users credentials
+
+
+
+//build action for libwkhtmltox.dll and PDf_style
+
+Build Action - content
+Copy To Output Directory - Copy Always

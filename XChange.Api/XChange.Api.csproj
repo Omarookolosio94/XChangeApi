@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
     <PackageReference Include="Google.Cloud.Storage.V1" Version="3.4.0" />
     <PackageReference Include="MailKit" Version="2.11.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -30,6 +31,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="PDF_Receipts\" />
   </ItemGroup>
 
   <PropertyGroup>

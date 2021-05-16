@@ -25,6 +25,7 @@ namespace XChange.Api.Models
         public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<Offers> Offers { get; set; }
         public virtual DbSet<Orders> Orders { get; set; }
+        public virtual DbSet<OrdersLog> OrdersLog { get; set; }
         public virtual DbSet<OtpLog> OtpLog { get; set; }
         public virtual DbSet<Payments> Payments { get; set; }
         public virtual DbSet<Products> Products { get; set; }
@@ -333,6 +334,23 @@ namespace XChange.Api.Models
                 entity.Property(e => e.TotalWeight).HasColumnName("Total_Weight");
 
                 entity.Property(e => e.UserId).HasColumnName("User_Id");
+            });
+
+            modelBuilder.Entity<OrdersLog>(entity =>
+            {
+                entity.Property(e => e.OrdersLogId).HasColumnName("Orders_Log_Id");
+
+                entity.Property(e => e.Activity).HasColumnType("text");
+
+                entity.Property(e => e.Error).HasColumnType("text");
+
+                entity.Property(e => e.IsSuccessful).HasColumnName("isSuccessful");
+
+                entity.Property(e => e.Receipt).HasColumnType("text");
+
+                entity.Property(e => e.TimeLogged)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
             });
 
             modelBuilder.Entity<OtpLog>(entity =>

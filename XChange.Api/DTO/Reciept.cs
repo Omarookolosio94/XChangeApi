@@ -7,8 +7,11 @@ namespace XChange.Api.DTO
 {
     public class Reciept
     {
+        public int Order_Id { get; set; }
         public int User_Id { get; set; }
         public string Order_Status { get; set; }
+        public string Billing_Address { get; set; }
+        public string Billing_Phone { get; set; }
         public decimal Total_Price { get; set; }
         public decimal Total_Tax { get; set; }
         public List<OrderedProducts> OrderedProducts { get; set; }
