@@ -35,6 +35,7 @@ namespace XChange.Api.Controllers
         private readonly IConverter _converter;
         public readonly IEmailService _emailService;
         private readonly IGoogleCloudStorageService _googleCloudStorageService;
+        private readonly IOrdersLogService _ordersLogService;
 
 
 
@@ -47,6 +48,7 @@ namespace XChange.Api.Controllers
             _ordersService = new OrdersService(new OrdersRepository(dbContext));
             _cartsService = new CartsService(new CartsRepository(dbContext));
             _addressService = new AddressService(new AddressRepository(dbContext));
+            _ordersLogService = new OrdersLogService(new OrdersLogRepository(dbContext));
             _converter = converter;
             _emailService = emailService;
             _googleCloudStorageService = googleCloudStorageService;
@@ -379,6 +381,9 @@ namespace XChange.Api.Controllers
             if(cartItems.Count < 1)
             {
                 response = new ApiResponse(400, "You have no item in cart. Please, place item in cart before proceeding to order.");
+                OrdersLog ordersLog = Utility.Utility.AddOrdersLog(userId, JsonSerializer.Serialize(response), false, "Placed an order");
+                _ordersLogService.AddOrdersLog(ordersLog);
+
                 return BadRequest(response);
             }
 
@@ -410,6 +415,9 @@ namespace XChange.Api.Controllers
                 else
                 {
                     response = new ApiResponse(400, "Product with productId: " + item.ProductId + " is no longer available in store. Please remove item from cart and proceed with your order.");
+                    OrdersLog ordersLog = Utility.Utility.AddOrdersLog(userId, JsonSerializer.Serialize(response), false, "Placed an order");
+                    _ordersLogService.AddOrdersLog(ordersLog);
+
                     return BadRequest(response);
                 }
             }
@@ -482,6 +490,10 @@ namespace XChange.Api.Controllers
             if (!dataValid)
             {
                 errors = new ModelError(400, "Pass in Required Information", errorList);
+
+                OrdersLog ordersLog = Utility.Utility.AddOrdersLog(userId , JsonSerializer.Serialize(errors) ,false , "Placed an order");
+                _ordersLogService.AddOrdersLog(ordersLog);
+
                 return BadRequest(errors);
             }
 
@@ -503,7 +515,7 @@ namespace XChange.Api.Controllers
                 Summary = order.Summary,
                 Tag = order.Tag,
                 Source = "Web",
-                IpAddress = " ",
+                IpAddress = "",
 
                 //ShipperId = 0,
                 //ShippingAddressId = 0,
@@ -549,22 +561,24 @@ namespace XChange.Api.Controllers
                 //update receipt url
                 makeOrder.OrderRecieptUrl = pdfUrl;
                 makeOrder.OrderReceiptName = fileName;
-
                 _ordersService.UpdateReceiptUrl(makeOrder);
 
-
-                //add audit log
-                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, "Made an order for the following products: " + productsId +  " Total_Price: " + reciept.Total_Price + " Order_Id: " + makeOrder.OrderId + "Reciept: " + JsonSerializer.Serialize(reciept));
+                //add audit and orders log
+                AuditLog auditLog = Utility.Utility.AddAuditLog(userId, "Made an order for the following products: " + productsId + " Total_Price: " + reciept.Total_Price + " Order_Id: " + makeOrder.OrderId + "Reciept: " + JsonSerializer.Serialize(reciept));
                 _auditLogService.AddAuditLog(auditLog);
 
-                //delete item from carts
-                _cartsService.DeleteCarts(cartIds);
+                OrdersLog ordersLog = Utility.Utility.AddOrdersLog(JsonSerializer.Serialize(reciept), userId);
+                _ordersLogService.AddOrdersLog(ordersLog);
 
                 return Ok(reciept);
             }
             else
             {
                 response = new ApiResponse(400, "Order failed , please place another");
+
+                OrdersLog ordersLog = Utility.Utility.AddOrdersLog(userId, JsonSerializer.Serialize(response), false, "Place a failed order");
+                _ordersLogService.AddOrdersLog(ordersLog);
+
                 return BadRequest(response);
             }
         }
@@ -577,4 +591,6 @@ namespace XChange.Api.Controllers
 
 //TODO:
 
+// Get IP Address
+// Get User device type
 // Add order's error log to view errors related to orders

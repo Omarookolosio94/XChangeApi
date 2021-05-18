@@ -85,6 +85,37 @@ namespace XChange.Api.Utility
 
         }
 
+        public static OrdersLog AddOrdersLog(int userId, string error, bool isSucessful = false, string activity = "")
+        {
+
+            OrdersLog ordersLog = new OrdersLog
+            {
+                Activity = activity,
+                UserId = userId,
+                Error = error,
+                IsSuccessful = isSucessful,
+                TimeLogged = DateTime.Now,
+            };
+
+            return ordersLog;
+        }
+
+        public static OrdersLog AddOrdersLog(string receipt, int userId, bool isSucessful = true)
+        {
+
+            OrdersLog ordersLog = new OrdersLog
+            {
+                Activity = "Placed an order successfully",
+                UserId = userId,
+                Receipt = receipt,
+                IsSuccessful = isSucessful,
+                TimeLogged = DateTime.Now,
+            };
+
+            return ordersLog;
+        }
+
+
         public static RefreshToken GenerateRefreshToken()
         {
             RefreshToken refreshToken = new RefreshToken();

@@ -11,5 +11,6 @@ namespace XChange.Api.Models
         public string Error { get; set; }
         public bool IsSuccessful { get; set; }
         public DateTime? TimeLogged { get; set; }
+        public int? UserId { get; set; }
     }
 }

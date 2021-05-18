@@ -8,16 +8,16 @@ using XChange.Api.Repositories.Interfaces;
 
 namespace XChange.Api.Repositories.Concretes
 {
-    public class AuditLogRepository : BaseRepository<AuditLog> , IAuditLogRepository
+    public class OrdersLogRepository : BaseRepository<OrdersLog>, IOrdersLogRepository
     {
-        private static string ModuleName = "AuditLogRepository";
+        private static string ModuleName = "OrdersLogRepository";
 
-        public AuditLogRepository(XChangeDatabaseContext dbContext)
+        public OrdersLogRepository(XChangeDatabaseContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<List<AuditLog>> GetAuditLogs()
+        public async Task<List<OrdersLog>> GetOrdersLog()
         {
             try
             {
@@ -25,12 +25,12 @@ namespace XChange.Api.Repositories.Concretes
             }
             catch (Exception ex)
             {
-                new Logger().LogError(ModuleName, "GetAuditLogs", "Error Getting Audit Logs" + ex + "\n");
+                new Logger().LogError(ModuleName, "GetOrdersLogs", "Error Getting Orders Logs" + ex + "\n");
                 throw;
             }
         }
 
-        public async Task<List<AuditLog>> GetAuditLogByUser(int userId)
+        public async Task<List<OrdersLog>> GetOrdersLogByUser(int userId)
         {
             try
             {
@@ -38,21 +38,21 @@ namespace XChange.Api.Repositories.Concretes
             }
             catch (Exception ex)
             {
-                new Logger().LogError(ModuleName, "GetAuditLogByUser", "Error Getting User Audit Logs" + ex + "\n");
+                new Logger().LogError(ModuleName, "GetOrdersLogByUser", "Error Getting User Orders Logs" + ex + "\n");
                 throw;
             }
         }
 
-        public async void AddAuditLog(AuditLog auditLog)
+        public async void AddOrdersLog(OrdersLog ordersLog)
         {
             try
             {
-                await InsertAsync(auditLog);
+                await InsertAsync(ordersLog);
                 await Commit();
             }
             catch (Exception ex)
             {
-                new Logger().LogError(ModuleName, "AddAuditLog", "Error adding order log" + ex + "\n");
+                new Logger().LogError(ModuleName, "OrdersLog", "Error adding order log" + ex + "\n");
                 throw;
             }
         }

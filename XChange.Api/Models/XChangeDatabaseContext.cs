@@ -359,6 +359,8 @@ namespace XChange.Api.Models
                 entity.Property(e => e.TimeLogged)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.UserId).HasColumnName("User_Id");
             });
 
             modelBuilder.Entity<OtpLog>(entity =>
