@@ -13394,23 +13394,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\A240990\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\osakp\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\A240990\\source\\XChangeApi\\XChange.Api\\XChange.Api.csproj",
+      "projectUniqueName": "C:\\Users\\osakp\\Desktop\\matrixweb\\Production\\XChangeApi\\XChange.Api\\XChange.Api.csproj",
       "projectName": "XChange.Api",
-      "projectPath": "C:\\Users\\A240990\\source\\XChangeApi\\XChange.Api\\XChange.Api.csproj",
-      "packagesPath": "C:\\Users\\A240990\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\A240990\\source\\XChangeApi\\XChange.Api\\obj\\",
+      "projectPath": "C:\\Users\\osakp\\Desktop\\matrixweb\\Production\\XChangeApi\\XChange.Api\\XChange.Api.csproj",
+      "packagesPath": "C:\\Users\\osakp\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\osakp\\Desktop\\matrixweb\\Production\\XChangeApi\\XChange.Api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\A240990\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\osakp\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -13422,9 +13423,10 @@
       },
       "frameworks": {
         "netcoreapp2.1": {
+          "targetAlias": "netcoreapp2.1",
           "projectReferences": {
-            "C:\\Users\\A240990\\source\\XChangeApi\\Utilities\\Utilities.csproj": {
-              "projectPath": "C:\\Users\\A240990\\source\\XChangeApi\\Utilities\\Utilities.csproj"
+            "C:\\Users\\osakp\\Desktop\\matrixweb\\Production\\XChangeApi\\Utilities\\Utilities.csproj": {
+              "projectPath": "C:\\Users\\osakp\\Desktop\\matrixweb\\Production\\XChangeApi\\Utilities\\Utilities.csproj"
             }
           }
         }
@@ -13437,6 +13439,7 @@
     },
     "frameworks": {
       "netcoreapp2.1": {
+        "targetAlias": "netcoreapp2.1",
         "dependencies": {
           "BCrypt.Net-Next": {
             "target": "Package",
@@ -13480,6 +13483,7 @@
             "version": "[2.1.14, )"
           },
           "Microsoft.NETCore.App": {
+            "suppressParent": "All",
             "target": "Package",
             "version": "[2.1.0, )",
             "autoReferenced": true
@@ -13502,10 +13506,16 @@
           }
         },
         "imports": [
-          "net461"
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
         ],
         "assetTargetFallback": true,
-        "warn": true
+        "warn": true,
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.301\\RuntimeIdentifierGraph.json"
       }
     }
   },
@@ -13514,7 +13524,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'EntityFramework 5.0.0' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'. This package may not be fully compatible with your project.",
+      "message": "Package 'EntityFramework 5.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework '.NETCoreApp,Version=v2.1'. This package may not be fully compatible with your project.",
       "libraryId": "EntityFramework",
       "targetGraphs": [
         ".NETCoreApp,Version=v2.1"
@@ -13524,7 +13534,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'System.Data.Entity.Repository 1.0.0.9' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'. This package may not be fully compatible with your project.",
+      "message": "Package 'System.Data.Entity.Repository 1.0.0.9' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework '.NETCoreApp,Version=v2.1'. This package may not be fully compatible with your project.",
       "libraryId": "System.Data.Entity.Repository",
       "targetGraphs": [
         ".NETCoreApp,Version=v2.1"
